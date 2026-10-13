@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Group 2 Hotel System</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .method-get {
+            color: #61affe;
+            background: rgba(97, 175, 254, .1);
+            border-color: #61affe;
+        }
+
+        .method-post {
+            color: #49cc90;
+            background: rgba(73, 204, 144, .1);
+            border-color: #49cc90;
+        }
+
+        .method-put {
+            color: #fca130;
+            background: rgba(252, 161, 48, .1);
+            border-color: #fca130;
+        }
+
+        .method-delete {
+            color: #f93e3e;
+            background: rgba(249, 62, 62, .1);
+            border-color: #f93e3e;
+        }
+
+        .method-patch {
+            color: #50e3c2;
+            background: rgba(80, 227, 194, .1);
+            border-color: #50e3c2;
+        }
+
+        .endpoint {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .method-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .endpoint-path {
+            font-family: monospace;
+            font-size: 1.1rem;
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 3px;
+            margin: 0.5rem 0;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .param-table th,
+        .param-table td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        .param-table th {
+            background: #f8f9fa;
+        }
+
+        .example-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        .service-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .service-provider {
+            border-left: 4px solid var(--primary);
+        }
+
+        .service-consumer {
+            border-left: 4px solid var(--secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Group 2 Hotel Management System API</h1>
+        <p>Version 1.0.0 | REST API Documentation</p>
+        <p><strong>Base URL:</strong> <code id="baseUrl"></code></p>
+    </header>
+
+    <section>
+        <h2>Overview</h2>
+        <p>This API provides hotel management services and integrates with external services (taxi, restaurant, tour).
+        </p>
+
+        <div class="service-card service-provider">
+            <h3>Services We Provide</h3>
+            <p>Other groups can consume these services:</p>
+            <ul>
+                <li><strong>Hotel Management</strong>: Complete hotel booking system</li>
+                <li><strong>User Authentication</strong>: Registration, login, session management</li>
+                <li><strong>Room Availability</strong>: Real-time room availability checking</li>
+                <li><strong>Booking Management</strong>: Create, view, cancel bookings</li>
+            </ul>
+        </div>
+
+        <div class="service-card service-consumer">
+            <h3>Services We Consume</h3>
+            <p>We integrate with these external services:</p>
+            <ul>
+                <li><strong>Taxi Service</strong>: Group 4/8</li>
+                <li><strong>Restaurant Service</strong>: Group 3/7</li>
+                <li><strong>Tour Service</strong>: Group 1/5/9</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="authentication">
+        <h2>Authentication</h2>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-post">POST</span> <strong>Register User</strong></div>
+            <div class="endpoint-path">/api/auth/register</div>
+            <p>Register a new user in the system.</p>
+
+            <h4>Request Body</h4>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>email</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>User email address</td>
+                </tr>
+                <tr>
+                    <td>password</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Password (min 6 chars)</td>
+                </tr>
+                <tr>
+                    <td>name</td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Full name</td>
+                </tr>
+                <tr>
+                    <td>role</td>
+                    <td>string</td>
+                    <td>No</td>
+                    <td>User role (customer, tour_guide, manager, admin)</td>
+                </tr>
+            </table>
+
+            <h4>Example Request</h4>
+            <div class="example-box">{
+                "email": "user@example.com",
+                "password": "password123",
+                "name": "John Doe",
+                "role": "customer"
+                }</div>
+        </div>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-post">POST</span> <strong>Login</strong></div>
+            <div class="endpoint-path">/api/auth/login</div>
+            <p>Authenticate user and create session.</p>
+
+            <h4>Example Request</h4>
+            <div class="example-box">{
+                "email": "user@example.com",
+                "password": "password123"
+                }</div>
+        </div>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-get">GET</span> <strong>Check Session</strong></div>
+            <div class="endpoint-path">/api/auth/session</div>
+            <p>Get current user session information.</p>
+        </div>
+    </section>
+
+    <section id="hotels">
+        <h2>Hotel Management</h2>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-get">GET</span> <strong>List Hotels</strong></div>
+            <div class="endpoint-path">/api/hotels</div>
+            <p>Get list of all hotels with filtering options.</p>
+
+            <h4>Query Parameters</h4>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>city</td>
+                    <td>string</td>
+                    <td>Filter by city</td>
+                </tr>
+                <tr>
+                    <td>min_price</td>
+                    <td>number</td>
+                    <td>Minimum price per night</td>
+                </tr>
+                <tr>
+                    <td>max_price</td>
+                    <td>number</td>
+                    <td>Maximum price per night</td>
+                </tr>
+                <tr>
+                    <td>amenities</td>
+                    <td>string</td>
+                    <td>Comma-separated amenities</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-get">GET</span> <strong>Get Hotel Details</strong></div>
+            <div class="endpoint-path">/api/hotels/{id}</div>
+            <p>Get detailed information about a specific hotel.</p>
+        </div>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-get">GET</span> <strong>Get Hotel Rooms</strong></div>
+            <div class="endpoint-path">/api/hotels/{id}/rooms</div>
+            <p>Get all rooms for a specific hotel.</p>
+
+            <h4>Query Parameters</h4>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>check_in</td>
+                    <td>date</td>
+                    <td>Check-in date (YYYY-MM-DD)</td>
+                </tr>
+                <tr>
+                    <td>check_out</td>
+                    <td>date</td>
+                    <td>Check-out date (YYYY-MM-DD)</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+
+    <section id="bookings">
+        <h2>Booking Management</h2>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-post">POST</span> <strong>Create Booking</strong></div>
+            <div class="endpoint-path">/api/bookings</div>
+            <p>Create a new hotel booking.</p>
+
+            <h4>Request Body</h4>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>hotel_id</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Hotel ID</td>
+                </tr>
+                <tr>
+                    <td>room_id</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Room ID</td>
+                </tr>
+                <tr>
+                    <td>check_in_date</td>
+                    <td>date</td>
+                    <td>Yes</td>
+                    <td>Check-in date (YYYY-MM-DD)</td>
+                </tr>
+                <tr>
+                    <td>check_out_date</td>
+                    <td>date</td>
+                    <td>Yes</td>
+                    <td>Check-out date (YYYY-MM-DD)</td>
+                </tr>
+                <tr>
+                    <td>adults</td>
+                    <td>integer</td>
+                    <td>Yes</td>
+                    <td>Number of adults</td>
+                </tr>
+                <tr>
+                    <td>children</td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Number of children</td>
+                </tr>
+            </table>
+
+            <h4>Example Request</h4>
+            <div class="example-box">{
+                "hotel_id": 1,
+                "room_id": 101,
+                "check_in_date": "2024-12-25",
+                "check_out_date": "2024-12-27",
+                "adults": 2,
+                "children": 1,
+                "special_requests": "Late check-in if possible"
+                }</div>
+        </div>
+    </section>
+
+    <section id="integration">
+        <h2>Service Integration</h2>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-get">GET</span> <strong>Service Discovery</strong></div>
+            <div class="endpoint-path">/api/services/discover</div>
+            <p>Discover available services and endpoints.</p>
+        </div>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-get">GET</span> <strong>Check Service Status</strong></div>
+            <div class="endpoint-path">/api/services/status</div>
+            <p>Check status of all integrated services.</p>
+
+            <h4>Query Parameters</h4>
+            <table class="param-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>service</td>
+                    <td>string</td>
+                    <td>Specific service to check (taxi, restaurant, tour, all)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="endpoint">
+            <div><span class="method-badge method-post">POST</span> <strong>Book External Service</strong></div>
+            <div class="endpoint-path">/api/services/book</div>
+            <p>Book taxi, restaurant, or tour service.</p>
+
+            <h4>Request Body</h4>
+            <div class="example-box">// Book Taxi
+                {
+                "service": "taxi",
+                "data": {
+                "pickup_location": "Hotel XYZ",
+                "destination": "Bole Airport",
+                "passengers": 3,
+                "vehicle_type": "standard"
+                }
+                }
+
+                // Book Restaurant
+                {
+                "service": "restaurant",
+                "data": {
+                "restaurant_id": 5,
+                "date": "2024-12-25",
+                "time": "19:30",
+                "guests": 4
+                }
+                }
+
+                // Book Tour
+                {
+                "service": "tour",
+                "data": {
+                "tour_id": 3,
+                "date": "2024-12-26",
+                "participants": 2
+                }
+                }</div>
+        </div>
+    </section>
+
+    <section id="testing">
+        <h2>Integration Testing</h2>
+        <p>Use our integration testing page to verify all services are working correctly:</p>
+        <p><a href="integration-test.html" style="color: var(--secondary); font-weight: bold;">Go to Integration Testing
+                Page →</a></p>
+    </section>
+
+    <footer style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd;">
+        <p><strong>Group 2 - Hotel Management System</strong></p>
+        <p>Contact: group2@example.com | API Version: 1.0.0</p>
+    </footer>
+
+    <script>
+        // Set base URL
+        document.getElementById('baseUrl').textContent =
+            window.location.origin + '/api';
+    </script>
+</body>
+
+</html>

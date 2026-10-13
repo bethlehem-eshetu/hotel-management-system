@@ -1,0 +1,1113 @@
+<?php
+// src/controllers/IntegrationsController.php
+require_once __DIR__ . '/../bootstrap.php';
+
+class IntegrationsController {
+    private $config;
+    private $serviceRegistry;
+    private $apiTimeout = 15;
+    private $maxRetries = 3;
+    private $useRealAPI = true;
+    
+    public function __construct() {
+        $this->config = config();
+        $this->serviceRegistry = $this->initializeServiceRegistry();
+        $this->apiTimeout = $this->config['integrations']['timeout'] ?? 15;
+        $this->maxRetries = $this->config['integrations']['max_retries'] ?? 3;
+        $this->useRealAPI = true;
+    }
+    
+    private function initializeServiceRegistry() {
+        $baseUrl = (isset($_SERVER['HTTPS']) ? 'https://' : 'http://') . 
+                  $_SERVER['HTTP_HOST'] . 
+                  dirname($_SERVER['PHP_SELF']);
+        
+        return [
+            'provided_services' => [
+                'hotel_management' => [
+                    'name' => 'Group 2 Hotel Management System',
+                    'description' => 'Complete hotel booking and management platform',
+                    'version' => '1.0.0',
+                    'base_url' => $baseUrl . '/api',
+                    'api_version' => 'v1',
+                    'contact' => 'group2@example.com',
+                    'documentation' => $baseUrl . '/pages/api-docs.html',
+                    'testing_page' => $baseUrl . '/pages/customer.html'
+                ]
+            ],
+            
+            'consumed_services' => [
+                'taxi' => [
+                    'provider_groups' => ['group4', 'group8'],
+                    'name' => 'Taxi Booking Service',
+                    'description' => 'Taxi booking and transportation service',
+                    'base_url' => 'https://taxi-system.infinityfreeapp.com/api',
+                    'api_key' => 'TAXI_GROUP_SECURE_KEY_2024',
+                    'enabled' => true,
+                    'timeout' => 10,
+                    'endpoints' => [
+                        'list' => ['GET', '/services.php', 'Get available taxis'],
+                        'book' => ['POST', '/bookings.php', 'Book a taxi'],
+                        'details' => ['GET', '/bookings.php', 'Get booking status']
+                    ]
+                ],
+                
+                'tour' => [
+                    'provider_groups' => ['group1', 'group5', 'group9'],
+                    'name' => 'Tour Management System',
+                    'description' => 'Tour packages and guided experiences',
+                    'base_url' => 'https://tour-management-web.onrender.com/api/v1',
+                    'api_key' => 'demo-api-key',
+                    'enabled' => true,
+                    'timeout' => 15,
+                    'endpoints' => [
+                        'list' => ['GET', '/tours.php', 'Get available tours'],
+                        'get' => ['GET', '/tours.php?id={id}', 'Get tour details'],
+                        'book' => ['POST', '/tours.php', 'Book a tour'],
+                        'places' => ['GET', '/places.php', 'Get featured places'],
+                        'reviews' => ['GET', '/reviews.php', 'Get tour reviews'],
+                        'add_review' => ['POST', '/reviews.php', 'Add tour review']
+                    ],
+                    'authentication' => 'X-API-KEY header required'
+                ]
+            ]
+        ];
+    }
+    
+    // ==================== CORE API METHODS ====================
+    
+    public function getTaxis() {
+        start_session();
+        if (!isset($_SESSION['uid'])) {
+            return json(['error' => 'Unauthorized. Please login first.'], 401);
+        }
+        
+        try {
+            $response = $this->callTaxiAPI('/services.php', 'GET', $_GET);
+            
+            if ($response['http_code'] === 200) {
+                $taxis = $this->extractTaxiDataFromResponse($response['data']);
+                
+                return json([
+                    'status' => 'success',
+                    'service' => 'taxi',
+                    'provider_groups' => ['group4', 'group8'],
+                    'data' => ['taxis' => $taxis],
+                    'metadata' => [
+                        'source' => 'Group 4/8 Taxi API',
+                        'total_taxis' => count($taxis),
+                        'response_time_ms' => $response['response_time_ms'],
+                        'http_code' => $response['http_code'],
+                        'api_mode' => 'real'
+                    ]
+                ]);
+            } else {
+                throw new Exception('Taxi API returned HTTP ' . $response['http_code']);
+            }
+            
+        } catch (Exception $e) {
+            error_log("Taxi API error: " . $e->getMessage());
+            return json([
+                'error' => 'Failed to fetch taxis',
+                'message' => $e->getMessage(),
+                'service' => 'taxi',
+                'api_mode' => 'real'
+            ], 503);
+        }
+    }
+    
+    public function bookService() {
+        start_session();
+        if (!isset($_SESSION['uid'])) {
+            return json(['error' => 'Unauthorized. Please login first.'], 401);
+        }
+        
+        $rawInput = file_get_contents('php://input');
+        $data = json_decode($rawInput, true);
+        
+        if (!$data) {
+            return json(['error' => 'Invalid JSON data'], 400);
+        }
+        
+        $validation = $this->validateBookingRequest($data);
+        if (!$validation['valid']) {
+            return json(['error' => 'Validation failed', 'details' => $validation['errors']], 400);
+        }
+        
+        $service = $data['service'];
+        $bookingData = $data['data'] ?? [];
+        
+        // Add user context
+        $bookingData['user_context'] = [
+            'user_id' => $_SESSION['uid'],
+            'user_email' => $_SESSION['email'] ?? '',
+            'user_name' => $_SESSION['name'] ?? '',
+            'booking_source' => 'Group2_HotelSystem'
+        ];
+        
+        try {
+            switch ($service) {
+                case 'taxi':
+                    $result = $this->bookRealTaxi($bookingData);
+                    break;
+                    
+                case 'tour':
+                    $result = $this->bookRealTour($bookingData);
+                    break;
+                    
+                default:
+                    throw new Exception('Unsupported service: ' . $service);
+            }
+            
+            // Log successful booking
+            $logId = $this->logIntegrationBooking(
+                $service, 
+                $_SESSION['uid'], 
+                $bookingData, 
+                $result, 
+                false,
+                $result['booking_id'] ?? null,
+                200
+            );
+            
+            // Save to specific booking table
+            if ($service === 'taxi' && $logId) {
+                $this->saveTaxiBooking($logId, $bookingData, $result);
+            } elseif ($service === 'tour' && $logId) {
+                $this->saveTourBooking($logId, $bookingData, $result);
+            }
+            
+            return json([
+                'status' => 'success',
+                'message' => ucfirst($service) . ' booked successfully via API',
+                'booking_details' => $result,
+                'service_info' => [
+                    'service' => $service,
+                    'provider' => $this->serviceRegistry['consumed_services'][$service]['name'],
+                    'log_id' => $logId,
+                    'external_booking_id' => $result['booking_id'] ?? null
+                ],
+                'user_context' => [
+                    'user_id' => $_SESSION['uid'],
+                    'user_name' => $_SESSION['name'] ?? ''
+                ],
+                'api_mode' => 'real',
+                'timestamp' => date('Y-m-d H:i:s')
+            ]);
+            
+        } catch (Exception $e) {
+            error_log("Booking error for $service: " . $e->getMessage());
+            
+            // Log failed attempt
+            $this->logIntegrationBooking(
+                $service, 
+                $_SESSION['uid'], 
+                $bookingData, 
+                ['error' => $e->getMessage()], 
+                false,
+                null,
+                500
+            );
+            
+            return json([
+                'error' => 'Booking failed',
+                'message' => $e->getMessage(),
+                'service' => $service,
+                'api_mode' => 'real',
+                'timestamp' => date('Y-m-d H:i:s')
+            ], 400);
+        }
+    }
+    
+    public function getServicesStatus() {
+        start_session();
+        if (!isset($_SESSION['uid'])) {
+            return json(['error' => 'Unauthorized. Please login first.'], 401);
+        }
+        
+        $services = ['taxi', 'tour'];
+        $status = [];
+        
+        foreach ($services as $service) {
+            try {
+                $serviceStatus = $this->checkServiceStatus($service);
+                $status[$service] = $serviceStatus;
+            } catch (Exception $e) {
+                $status[$service] = [
+                    'status' => 'error',
+                    'available' => false,
+                    'message' => 'Service check failed: ' . $e->getMessage(),
+                    'last_checked' => date('Y-m-d H:i:s')
+                ];
+            }
+        }
+        
+        return json([
+            'services' => $status,
+            'timestamp' => date('Y-m-d H:i:s'),
+            'api_mode' => 'real',
+            'message' => 'Services status retrieved successfully'
+        ]);
+    }
+    
+    public function getTours() {
+        start_session();
+        if (!isset($_SESSION['uid'])) {
+            return json(['error' => 'Unauthorized. Please login first.'], 401);
+        }
+        
+        try {
+            $response = $this->callTourAPI('/tours.php', 'GET', $_GET);
+            
+            if ($response['http_code'] === 200) {
+                $tours = $this->extractTourDataFromResponse($response['data']);
+                
+                return json([
+                    'status' => 'success',
+                    'service' => 'tour',
+                    'provider_groups' => ['group1', 'group5', 'group9'],
+                    'data' => [
+                        'tours' => $tours,
+                        'currency' => 'USD',
+                        'supported_payments' => ['cash', 'card', 'mobile_wallet']
+                    ],
+                    'metadata' => [
+                        'source' => 'Group 1/5/9 Tour API',
+                        'total_tours' => count($tours),
+                        'response_time_ms' => $response['response_time_ms'],
+                        'http_code' => $response['http_code'],
+                        'api_mode' => 'real'
+                    ]
+                ]);
+            } else {
+                throw new Exception('Tour API returned HTTP ' . $response['http_code']);
+            }
+            
+        } catch (Exception $e) {
+            error_log("Tour API error: " . $e->getMessage());
+            return json([
+                'error' => 'Failed to fetch tours',
+                'message' => $e->getMessage(),
+                'service' => 'tour',
+                'api_mode' => 'real'
+            ], 503);
+        }
+    }
+    
+    public function getServiceOptions() {
+        start_session();
+        if (!isset($_SESSION['uid'])) {
+            return json(['error' => 'Unauthorized. Please login first.'], 401);
+        }
+        
+        // Extract service name from URL
+        $pathParts = explode('/', $_SERVER['REQUEST_URI']);
+        $service = end($pathParts - 1); // Get service name from URL
+        
+        if (!in_array($service, ['taxi', 'tour'])) {
+            return json(['error' => 'Invalid service type'], 400);
+        }
+        
+        try {
+            switch ($service) {
+                case 'taxi':
+                    $options = $this->getTaxiOptions();
+                    break;
+                case 'tour':
+                    $options = $this->getTourOptions();
+                    break;
+                default:
+                    throw new Exception('Service not supported');
+            }
+            
+            return json([
+                'status' => 'success',
+                'service' => $service,
+                'options' => $options,
+                'api_mode' => 'real'
+            ]);
+            
+        } catch (Exception $e) {
+            return json([
+                'error' => 'Failed to get service options',
+                'message' => $e->getMessage(),
+                'service' => $service
+            ], 500);
+        }
+    }
+    
+    // ==================== TAXI API METHODS ====================
+    
+    private function callTaxiAPI($endpoint, $method = 'GET', $data = []) {
+        $config = $this->serviceRegistry['consumed_services']['taxi'];
+        $url = $config['base_url'] . $endpoint;
+        
+        $startTime = microtime(true);
+        
+        // Build query string for GET requests
+        if ($method === 'GET' && !empty($data)) {
+            $query = http_build_query($data);
+            $url .= (strpos($url, '?') === false ? '?' : '&') . $query;
+        }
+        
+        $ch = curl_init();
+        $headers = [
+            'X-API-KEY: ' . $config['api_key'],
+            'Accept: application/json',
+            'User-Agent: HotelSystem/1.0'
+        ];
+        
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => $config['timeout'],
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 3
+        ]);
+        
+        // Handle POST requests
+        if ($method === 'POST') {
+            curl_setopt($ch, CURLOPT_POST, true);
+            $postData = json_encode($data);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+            $headers[] = 'Content-Type: application/json';
+        }
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $responseTime = microtime(true) - $startTime;
+        $error = curl_error($ch);
+        
+        // Log for debugging
+        error_log("Taxi API: {$method} {$url} - HTTP {$httpCode} - Error: " . ($error ?: 'None'));
+        
+        curl_close($ch);
+        
+        if ($error) {
+            throw new Exception('CURL error: ' . $error);
+        }
+        
+        $parsedData = null;
+        if ($response) {
+            $parsedData = json_decode($response, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                // Try to parse as plain text
+                if (strpos($response, '{') !== false || strpos($response, '[') !== false) {
+                    preg_match('/\{.*\}/s', $response, $matches);
+                    if (!empty($matches)) {
+                        $parsedData = json_decode($matches[0], true);
+                    }
+                }
+                
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $parsedData = ['raw' => $response];
+                }
+            }
+        }
+        
+        return [
+            'http_code' => $httpCode,
+            'response_time_ms' => round($responseTime * 1000, 2),
+            'data' => $parsedData,
+            'raw_response' => $response,
+            'url' => $url,
+            'method' => $method
+        ];
+    }
+    
+    private function extractTaxiDataFromResponse($responseData) {
+        $taxis = [];
+        
+        if (is_array($responseData)) {
+            // Check different response formats
+            if (isset($responseData['data']) && is_array($responseData['data'])) {
+                $responseData = $responseData['data'];
+            }
+            
+            if (isset($responseData['taxis']) && is_array($responseData['taxis'])) {
+                $responseData = $responseData['taxis'];
+            }
+            
+            if (isset($responseData[0]) && is_array($responseData[0])) {
+                return array_map(function($taxi) {
+                    return [
+                        'id' => $taxi['id'] ?? rand(1000, 9999),
+                        'name' => $taxi['name'] ?? $taxi['vehicle_name'] ?? 'Taxi',
+                        'type' => $taxi['type'] ?? $taxi['vehicle_type'] ?? 'standard',
+                        'base_price' => floatval($taxi['base_price'] ?? $taxi['price'] ?? 5.00),
+                        'price_per_km' => floatval($taxi['price_per_km'] ?? $taxi['per_km_price'] ?? 1.50),
+                        'capacity' => $taxi['capacity'] ?? $taxi['seats'] ?? 4,
+                        'estimated_arrival' => $taxi['estimated_arrival'] ?? $taxi['eta'] ?? '5-10 minutes',
+                        'available' => $taxi['available'] ?? true,
+                        'driver_name' => $taxi['driver_name'] ?? null,
+                        'vehicle_number' => $taxi['vehicle_number'] ?? null
+                    ];
+                }, $responseData);
+            }
+            
+            // Single taxi object
+            if (isset($responseData['id']) || isset($responseData['name'])) {
+                return [array_map(function($taxi) {
+                    return [
+                        'id' => $taxi['id'] ?? rand(1000, 9999),
+                        'name' => $taxi['name'] ?? 'Taxi',
+                        'type' => $taxi['type'] ?? 'standard',
+                        'base_price' => floatval($taxi['base_price'] ?? 5.00),
+                        'price_per_km' => floatval($taxi['price_per_km'] ?? 1.50),
+                        'capacity' => $taxi['capacity'] ?? 4,
+                        'estimated_arrival' => $taxi['estimated_arrival'] ?? '5-10 minutes',
+                        'available' => $taxi['available'] ?? true
+                    ];
+                }, [$responseData])];
+            }
+        }
+        
+        return [];
+    }
+    
+    private function bookRealTaxi($bookingData) {
+        $config = $this->serviceRegistry['consumed_services']['taxi'];
+        
+        $payload = [
+            'pickup_location' => $bookingData['pickup_location'],
+            'dropoff_location' => $bookingData['dropoff_location'],
+            'pickup_time' => $bookingData['pickup_time'],
+            'passengers' => $bookingData['passengers'] ?? 1,
+            'service_type' => $bookingData['service_type'] ?? 'standard',
+            'customer_name' => $bookingData['user_context']['user_name'],
+            'customer_email' => $bookingData['user_context']['user_email'],
+            'customer_phone' => $bookingData['phone'] ?? 'N/A'
+        ];
+        
+        // Add service_id if provided
+        if (!empty($bookingData['service_id'])) {
+            $payload['service_id'] = $bookingData['service_id'];
+        }
+        
+        $response = $this->callTaxiAPI('/bookings.php', 'POST', $payload);
+        
+        if ($response['http_code'] === 200) {
+            $responseData = $response['data'];
+            
+            return [
+                'booking_id' => $responseData['booking_id'] ?? $responseData['id'] ?? 'TAXI-' . time(),
+                'status' => $responseData['status'] ?? 'confirmed',
+                'message' => $responseData['message'] ?? 'Taxi booked successfully',
+                'estimated_fare' => $responseData['estimated_fare'] ?? null,
+                'driver_assigned' => $responseData['driver'] ?? null,
+                'pickup_time' => $payload['pickup_time'],
+                'api_response' => $responseData
+            ];
+        } else {
+            $errorMsg = 'Taxi booking failed: HTTP ' . $response['http_code'];
+            if (isset($response['data']['message'])) {
+                $errorMsg .= ' - ' . $response['data']['message'];
+            } else if (isset($response['data']['error'])) {
+                $errorMsg .= ' - ' . $response['data']['error'];
+            }
+            throw new Exception($errorMsg);
+        }
+    }
+    
+    private function getTaxiOptions() {
+        $response = $this->callTaxiAPI('/services.php', 'GET');
+        
+        if ($response['http_code'] === 200) {
+            $services = $response['data'];
+            
+            // Transform to our format
+            $options = [];
+            if (is_array($services)) {
+                foreach ($services as $service) {
+                    $options[] = [
+                        'id' => $service['id'] ?? null,
+                        'name' => $service['name'] ?? 'Taxi Service',
+                        'description' => $service['description'] ?? '',
+                        'base_price' => floatval($service['base_price'] ?? 0),
+                        'price_per_km' => floatval($service['price_per_km'] ?? 0),
+                        'capacity' => $service['capacity'] ?? 4,
+                        'features' => $service['features'] ?? []
+                    ];
+                }
+            }
+            
+            return $options;
+        } else {
+            throw new Exception('Failed to fetch taxi options');
+        }
+    }
+    
+    // ==================== TOUR API METHODS ====================
+    
+    private function callTourAPI($endpoint, $method = 'GET', $data = []) {
+        $config = $this->serviceRegistry['consumed_services']['tour'];
+        
+        $baseUrl = rtrim($config['base_url'], '/') . '/';
+        $url = $baseUrl . ltrim($endpoint, '/');
+        
+        $startTime = microtime(true);
+        
+        $ch = curl_init();
+        $headers = [
+            'X-API-KEY: ' . $config['api_key'],
+            'Accept: application/json',
+            'User-Agent: HotelSystem/1.0'
+        ];
+        
+        if ($method === 'GET' && !empty($data)) {
+            $query = http_build_query($data);
+            $url .= (strpos($url, '?') === false ? '?' : '&') . $query;
+        }
+        
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => $config['timeout'],
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 3
+        ]);
+        
+        if ($method === 'POST') {
+            curl_setopt($ch, CURLOPT_POST, true);
+            $postData = json_encode($data);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+            $headers[] = 'Content-Type: application/json';
+        }
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $responseTime = microtime(true) - $startTime;
+        $error = curl_error($ch);
+        
+        if ($error) {
+            throw new Exception('CURL error: ' . $error);
+        }
+        
+        curl_close($ch);
+        
+        $parsedData = null;
+        if ($response) {
+            $parsedData = json_decode($response, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid JSON response from tour API');
+            }
+        }
+        
+        return [
+            'http_code' => $httpCode,
+            'response_time_ms' => round($responseTime * 1000, 2),
+            'data' => $parsedData,
+            'raw_response' => $response,
+            'url' => $url,
+            'method' => $method
+        ];
+    }
+    
+    private function extractTourDataFromResponse($responseData) {
+        $tours = [];
+        
+        if (is_array($responseData)) {
+            if (isset($responseData['data']) && is_array($responseData['data'])) {
+                $responseData = $responseData['data'];
+            }
+            
+            if (isset($responseData[0]) && is_array($responseData[0])) {
+                return array_map(function($tour) {
+                    return [
+                        'id' => $tour['id'] ?? null,
+                        'title' => $tour['title'] ?? 'Tour',
+                        'description' => $tour['description'] ?? 'Tour description',
+                        'location' => $tour['location'] ?? 'Various locations',
+                        'price' => floatval($tour['price'] ?? 0),
+                        'schedule_date' => $tour['schedule_date'] ?? null,
+                        'duration_hours' => $tour['duration'] ?? 4,
+                        'guide_id' => $tour['guide_id'] ?? null,
+                        'available' => $tour['available'] ?? true,
+                        'rating' => $tour['rating'] ?? 4.5,
+                        'max_participants' => $tour['max_participants'] ?? 20
+                    ];
+                }, $responseData);
+            }
+        }
+        
+        return [];
+    }
+    
+    private function bookRealTour($bookingData) {
+        $config = $this->serviceRegistry['consumed_services']['tour'];
+        
+        $payload = [
+            'tour_id' => $bookingData['tour_id'],
+            'email' => $bookingData['user_context']['user_email'],
+            'name' => $bookingData['user_context']['user_name']
+        ];
+        
+        // Add optional fields
+        if (!empty($bookingData['participants'])) {
+            $payload['participants'] = $bookingData['participants'];
+        }
+        
+        if (!empty($bookingData['special_requests'])) {
+            $payload['special_requests'] = $bookingData['special_requests'];
+        }
+        
+        if (!empty($bookingData['tour_date'])) {
+            $payload['tour_date'] = $bookingData['tour_date'];
+        }
+        
+        if (!empty($bookingData['pickup_location'])) {
+            $payload['pickup_location'] = $bookingData['pickup_location'];
+        }
+        
+        $response = $this->callTourAPI('/tours.php', 'POST', $payload);
+        
+        if ($response['http_code'] === 200) {
+            $responseData = $response['data'];
+            
+            return [
+                'booking_id' => $responseData['booking_id'] ?? $responseData['data']['booking_id'] ?? 'TOUR-' . time(),
+                'status' => $responseData['status'] ?? $responseData['data']['status'] ?? 'confirmed',
+                'message' => $responseData['message'] ?? 'Tour booked successfully',
+                'tour_id' => $payload['tour_id'],
+                'api_response' => $responseData
+            ];
+        } else {
+            $errorMsg = 'Tour booking failed: HTTP ' . $response['http_code'];
+            if (isset($response['data']['message'])) {
+                $errorMsg .= ' - ' . $response['data']['message'];
+            } else if (isset($response['data']['error'])) {
+                $errorMsg .= ' - ' . $response['data']['error'];
+            }
+            throw new Exception($errorMsg);
+        }
+    }
+    
+    private function getTourOptions() {
+        $response = $this->callTourAPI('/tours.php', 'GET');
+        
+        if ($response['http_code'] === 200) {
+            $tours = $this->extractTourDataFromResponse($response['data']);
+            
+            // Get places for context
+            $placesResponse = $this->callTourAPI('/places.php', 'GET');
+            $places = [];
+            if ($placesResponse['http_code'] === 200) {
+                $places = $placesResponse['data']['data'] ?? [];
+            }
+            
+            return [
+                'tours' => $tours,
+                'places' => $places,
+                'total_tours' => count($tours)
+            ];
+        } else {
+            throw new Exception('Failed to fetch tour options');
+        }
+    }
+    
+    // ==================== SERVICE STATUS METHODS ====================
+    
+    private function checkServiceStatus($service) {
+        switch ($service) {
+            case 'taxi':
+                return $this->checkTaxiServiceStatus();
+            case 'tour':
+                return $this->checkTourServiceStatus();
+            default:
+                throw new Exception('Unknown service type');
+        }
+    }
+    
+    private function checkTourServiceStatus() {
+        try {
+            $response = $this->callTourAPI('/tours.php', 'GET', ['limit' => 1]);
+            
+            if ($response['http_code'] === 200) {
+                return [
+                    'status' => 'online',
+                    'available' => true,
+                    'message' => 'Tour service is operational',
+                    'last_checked' => date('Y-m-d H:i:s'),
+                    'response_time_ms' => $response['response_time_ms'],
+                    'http_code' => $response['http_code']
+                ];
+            } else {
+                return [
+                    'status' => 'offline',
+                    'available' => false,
+                    'message' => 'Tour service returned HTTP ' . $response['http_code'],
+                    'last_checked' => date('Y-m-d H:i:s'),
+                    'http_code' => $response['http_code']
+                ];
+            }
+            
+        } catch (Exception $e) {
+            return [
+                'status' => 'offline',
+                'available' => false,
+                'message' => 'Tour service is currently unavailable: ' . $e->getMessage(),
+                'last_checked' => date('Y-m-d H:i:s')
+            ];
+        }
+    }
+    
+    private function checkTaxiServiceStatus() {
+        try {
+            $response = $this->callTaxiAPI('/services.php', 'GET', ['limit' => 1]);
+            
+            if ($response['http_code'] === 200) {
+                return [
+                    'status' => 'online',
+                    'available' => true,
+                    'message' => 'Taxi service is operational',
+                    'last_checked' => date('Y-m-d H:i:s'),
+                    'response_time_ms' => $response['response_time_ms'],
+                    'http_code' => $response['http_code']
+                ];
+            } else if ($response['http_code'] >= 500) {
+                return [
+                    'status' => 'offline',
+                    'available' => false,
+                    'message' => 'Taxi service server error (HTTP ' . $response['http_code'] . ')',
+                    'last_checked' => date('Y-m-d H:i:s'),
+                    'http_code' => $response['http_code']
+                ];
+            } else {
+                return [
+                    'status' => 'degraded',
+                    'available' => true,
+                    'message' => 'Taxi service responded with HTTP ' . $response['http_code'],
+                    'last_checked' => date('Y-m-d H:i:s'),
+                    'http_code' => $response['http_code']
+                ];
+            }
+            
+        } catch (Exception $e) {
+            return [
+                'status' => 'offline',
+                'available' => false,
+                'message' => 'Taxi service is currently unavailable: ' . $e->getMessage(),
+                'last_checked' => date('Y-m-d H:i:s')
+            ];
+        }
+    }
+    
+    // ==================== DATABASE METHODS ====================
+    
+    private function saveTourBooking($integrationId, $bookingData, $responseData) {
+        try {
+            $db = db();
+            $this->createTourBookingsTable();
+            
+            $bookingRef = 'HTL-TOUR-' . date('Ymd') . '-' . str_pad(rand(100, 999), 3, '0', STR_PAD_LEFT);
+            
+            $stmt = $db->prepare("
+                INSERT INTO tour_bookings 
+                (integration_booking_id, user_id, tour_id, tour_date, 
+                 participants, status, booking_reference, 
+                 external_reference, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            ");
+            
+            $stmt->execute([
+                $integrationId,
+                $_SESSION['uid'],
+                $bookingData['tour_id'] ?? null,
+                $bookingData['tour_date'] ?? date('Y-m-d'),
+                $bookingData['participants'] ?? 1,
+                $responseData['status'] ?? 'confirmed',
+                $bookingRef,
+                $responseData['booking_id'] ?? null
+            ]);
+            
+            return $db->lastInsertId();
+        } catch (Exception $e) {
+            error_log("Error saving tour booking: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    private function saveTaxiBooking($integrationId, $bookingData, $responseData) {
+        try {
+            $db = db();
+            $this->createTaxiBookingsTable();
+            
+            $bookingRef = 'HTL-TAXI-' . date('Ymd') . '-' . str_pad(rand(100, 999), 3, '0', STR_PAD_LEFT);
+            
+            $stmt = $db->prepare("
+                INSERT INTO taxi_bookings 
+                (integration_booking_id, user_id, pickup_location, dropoff_location, 
+                 pickup_time, passengers, estimated_fare, status, booking_reference, 
+                 external_reference, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            ");
+            
+            $stmt->execute([
+                $integrationId,
+                $_SESSION['uid'],
+                $bookingData['pickup_location'],
+                $bookingData['dropoff_location'],
+                $bookingData['pickup_time'],
+                $bookingData['passengers'] ?? 1,
+                $responseData['estimated_fare'] ?? 0,
+                $responseData['status'] ?? 'confirmed',
+                $bookingRef,
+                $responseData['booking_id'] ?? null
+            ]);
+            
+            return $db->lastInsertId();
+        } catch (Exception $e) {
+            error_log("Error saving taxi booking: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    private function logIntegrationBooking($service, $userId, $requestData, $responseData, $isSimulated, $externalBookingId = null, $httpStatus = 200) {
+        try {
+            $db = db();
+            $this->createIntegrationBookingsTable();
+            
+            $stmt = $db->prepare("
+                INSERT INTO integration_bookings 
+                (user_id, service_type, request_data, response_data, 
+                 external_booking_id, status_code, is_simulated, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+            ");
+            
+            $stmt->execute([
+                $userId,
+                $service,
+                json_encode($requestData),
+                json_encode($responseData),
+                $externalBookingId,
+                $httpStatus,
+                $isSimulated ? 1 : 0
+            ]);
+            
+            return $db->lastInsertId();
+        } catch (Exception $e) {
+            error_log("Error logging integration booking: " . $e->getMessage());
+            return null;
+        }
+    }
+    
+    private function createTourBookingsTable() {
+        try {
+            $db = db();
+            $sql = "
+            CREATE TABLE IF NOT EXISTS tour_bookings (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                integration_booking_id INT,
+                user_id INT NOT NULL,
+                tour_id INT,
+                tour_date DATE,
+                participants INT DEFAULT 1,
+                total_price DECIMAL(10,2),
+                status VARCHAR(50) DEFAULT 'pending',
+                booking_reference VARCHAR(100) UNIQUE,
+                external_reference VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_user_id (user_id),
+                INDEX idx_status (status),
+                INDEX idx_tour_date (tour_date)
+            )";
+            
+            $db->exec($sql);
+            return true;
+        } catch (Exception $e) {
+            error_log("Error creating tour_bookings table: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    private function createTaxiBookingsTable() {
+        try {
+            $db = db();
+            $sql = "
+            CREATE TABLE IF NOT EXISTS taxi_bookings (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                integration_booking_id INT,
+                user_id INT NOT NULL,
+                pickup_location VARCHAR(255),
+                dropoff_location VARCHAR(255),
+                pickup_time DATETIME,
+                passengers INT DEFAULT 1,
+                estimated_fare DECIMAL(10,2),
+                status VARCHAR(50) DEFAULT 'pending',
+                booking_reference VARCHAR(100) UNIQUE,
+                external_reference VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_user_id (user_id),
+                INDEX idx_status (status),
+                INDEX idx_pickup_time (pickup_time)
+            )";
+            
+            $db->exec($sql);
+            return true;
+        } catch (Exception $e) {
+            error_log("Error creating taxi_bookings table: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    private function createIntegrationBookingsTable() {
+        try {
+            $db = db();
+            $sql = "
+            CREATE TABLE IF NOT EXISTS integration_bookings (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT NOT NULL,
+                service_type VARCHAR(50) NOT NULL,
+                request_data TEXT,
+                response_data TEXT,
+                external_booking_id VARCHAR(100),
+                status_code INT,
+                is_simulated BOOLEAN DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_user_id (user_id),
+                INDEX idx_service_type (service_type),
+                INDEX idx_created_at (created_at)
+            )";
+            
+            $db->exec($sql);
+            return true;
+        } catch (Exception $e) {
+            error_log("Error creating integration_bookings table: " . $e->getMessage());
+            return false;
+        }
+    }
+    
+    // ==================== HELPER METHODS ====================
+    
+    private function validateBookingRequest($data) {
+        $errors = [];
+        
+        if (empty($data['service'])) {
+            $errors[] = 'Service type is required';
+        }
+        
+        if (!in_array($data['service'] ?? '', ['taxi', 'tour'])) {
+            $errors[] = 'Invalid service type. Only taxi and tour are supported';
+        }
+        
+        if (empty($data['data'])) {
+            $errors[] = 'Booking data is required';
+        }
+        
+        // Service-specific validation
+        if ($data['service'] === 'taxi') {
+            $taxiData = $data['data'];
+            if (empty($taxiData['pickup_location'])) {
+                $errors[] = 'Pickup location is required for taxi booking';
+            }
+            if (empty($taxiData['dropoff_location'])) {
+                $errors[] = 'Dropoff location is required for taxi booking';
+            }
+            if (empty($taxiData['pickup_time'])) {
+                $errors[] = 'Pickup time is required for taxi booking';
+            }
+        }
+        
+        if ($data['service'] === 'tour') {
+            $tourData = $data['data'];
+            if (empty($tourData['tour_id'])) {
+                $errors[] = 'Tour ID is required for tour booking';
+            }
+        }
+        
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors
+        ];
+    }
+    
+    // ==================== DEBUG METHODS ====================
+    
+    public function debugTaxiConnection() {
+        try {
+            $response = $this->callTaxiAPI('/services.php', 'GET', []);
+            
+            return json([
+                'status' => 'success',
+                'test_url' => $response['url'],
+                'http_code' => $response['http_code'],
+                'response_time_ms' => $response['response_time_ms'],
+                'response_data' => $response['data'],
+                'raw_response_preview' => substr($response['raw_response'], 0, 500),
+                'timestamp' => date('Y-m-d H:i:s'),
+                'api_mode' => 'real'
+            ]);
+            
+        } catch (Exception $e) {
+            return json([
+                'error' => $e->getMessage(),
+                'timestamp' => date('Y-m-d H:i:s'),
+                'api_mode' => 'real'
+            ], 500);
+        }
+    }
+    
+    public function debugTourConnection() {
+        try {
+            $response = $this->callTourAPI('/tours.php', 'GET', ['limit' => 2]);
+            
+            return json([
+                'status' => 'success',
+                'test_url' => $response['url'],
+                'http_code' => $response['http_code'],
+                'response_time_ms' => $response['response_time_ms'],
+                'response_data' => $response['data'],
+                'timestamp' => date('Y-m-d H:i:s'),
+                'api_mode' => 'real'
+            ]);
+            
+        } catch (Exception $e) {
+            return json([
+                'error' => $e->getMessage(),
+                'timestamp' => date('Y-m-d H:i:s'),
+                'api_mode' => 'real'
+            ], 500);
+        }
+    }
+    
+    public function testTourConnection() {
+        return $this->debugTourConnection();
+    }
+    
+    public function discoverServices() {
+        start_session();
+        if (!isset($_SESSION['uid'])) {
+            return json(['error' => 'Unauthorized. Please login first.'], 401);
+        }
+        
+        $services = $this->serviceRegistry['consumed_services'];
+        
+        return json([
+            'status' => 'success',
+            'services' => $services,
+            'timestamp' => date('Y-m-d H:i:s'),
+            'api_mode' => 'real'
+        ]);
+    }
+    
+    public function getRestaurants() {
+        // Placeholder for future restaurant service integration
+        start_session();
+        if (!isset($_SESSION['uid'])) {
+            return json(['error' => 'Unauthorized. Please login first.'], 401);
+        }
+        
+        return json([
+            'status' => 'info',
+            'message' => 'Restaurant service integration coming soon',
+            'service' => 'restaurant',
+            'api_mode' => 'real'
+        ]);
+    }
+}

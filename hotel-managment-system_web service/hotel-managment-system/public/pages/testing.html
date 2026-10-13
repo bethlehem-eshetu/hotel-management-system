@@ -1,0 +1,79 @@
+<!-- test-taxi.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test Taxi Integration</title>
+</head>
+
+<body>
+    <h1>Taxi Integration Test</h1>
+
+    <button onclick="testAPI()">Test /api/services/taxis</button>
+    <button onclick="testAuth()">Test Authentication</button>
+
+    <div id="result" style="margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 5px;"></div>
+
+    <script>
+        const API_BASE = '/api';
+
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing /api/services/taxis...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/services/taxis`, {
+                    credentials: 'include'
+                });
+
+                resultDiv.innerHTML += `<p>Status: ${response.status} ${response.statusText}</p>`;
+                resultDiv.innerHTML += `<p>Content-Type: ${response.headers.get('content-type')}</p>`;
+
+                const text = await response.text();
+                resultDiv.innerHTML += `<h3>Response:</h3>`;
+                resultDiv.innerHTML += `<pre style="background: white; padding: 10px; border-radius: 5px;">${escapeHtml(text)}</pre>`;
+
+                // Try to parse as JSON
+                try {
+                    const json = JSON.parse(text);
+                    resultDiv.innerHTML += `<h3>Parsed JSON:</h3>`;
+                    resultDiv.innerHTML += `<pre style="background: #e8f5e9; padding: 10px; border-radius: 5px;">${JSON.stringify(json, null, 2)}</pre>`;
+                } catch (e) {
+                    resultDiv.innerHTML += `<p style="color: red;">Not valid JSON: ${e.message}</p>`;
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testAuth() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Testing authentication...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/session`, {
+                    credentials: 'include'
+                });
+
+                resultDiv.innerHTML += `<p>Status: ${response.status} ${response.statusText}</p>`;
+                const data = await response.json();
+                resultDiv.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+
+            } catch (error) {
+                resultDiv.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+
+</html>

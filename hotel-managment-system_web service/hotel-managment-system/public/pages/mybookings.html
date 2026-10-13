@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings | EthioHotel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Keep all your existing CSS styles */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --dark: #1a1a2e;
+            --gray: #7f8c8d;
+            --light: #f8f9fa;
+            --eth-green: #078930;
+            --eth-yellow: #fcdd09;
+            --eth-red: #da121a;
+            --eth-blue: #0f47af;
+            --gradient-primary: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            --gradient-ethiopian: linear-gradient(135deg, var(--eth-green), var(--eth-blue));
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .filter-tab {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        .filter-tab.active {
+            background: var(--gradient-ethiopian);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Bookings Grid */
+        .bookings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .bookings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Booking Card */
+        .booking-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .booking-header {
+            padding: 1.5rem;
+            background: var(--gradient-ethiopian);
+            color: white;
+            position: relative;
+        }
+
+        .booking-id {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .booking-status {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-confirmed {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .status-cancelled {
+            background: rgba(231, 76, 60, 0.2);
+            color: #fff;
+        }
+
+        .status-completed {
+            background: rgba(39, 174, 96, 0.2);
+            color: #fff;
+        }
+
+        .status-pending {
+            background: rgba(243, 156, 18, 0.2);
+            color: #fff;
+        }
+
+        .booking-body {
+            padding: 1.5rem;
+        }
+
+        .booking-info {
+            margin-bottom: 1.5rem;
+        }
+
+        .booking-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .booking-info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .booking-info-label {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .booking-info-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .booking-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--eth-green);
+            text-align: right;
+            margin: 1rem 0;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--gradient-ethiopian);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--gray);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
+            grid-column: 1 / -1;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: var(--dark);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: var(--success);
+            color: white;
+            border-radius: 5px;
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .notification.error {
+            background: var(--accent);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Cancel Confirmation */
+        .cancel-confirmation {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .cancel-confirmation i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        /* Refund Info */
+        .refund-info {
+            background: #fff8e1;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border-left: 4px solid var(--warning);
+        }
+
+        .refund-info h4 {
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header - SAME AS hotel.html -->
+    <header>
+        <nav class="navbar">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <i class="fas fa-hotel"></i>
+                EthioHotel
+            </div>
+
+            <div class="nav-links">
+                <a href="customer.html">Dashboard</a>
+                <a href="hotels.html">Hotels</a>
+                <a href="mybookings.html" class="active">My Bookings</a>
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="userName">User</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>My Bookings</h1>
+            <p>View, manage, and cancel your hotel reservations</p>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs" id="filterTabs">
+            <div class="filter-tab active" onclick="filterBookings('all')">All Bookings</div>
+            <div class="filter-tab" onclick="filterBookings('confirmed')">Confirmed</div>
+            <div class="filter-tab" onclick="filterBookings('pending')">Pending</div>
+            <div class="filter-tab" onclick="filterBookings('cancelled')">Cancelled</div>
+            <div class="filter-tab" onclick="filterBookings('completed')">Completed</div>
+            <div class="filter-tab" onclick="filterBookings('upcoming')">Upcoming</div>
+        </div>
+
+        <!-- Bookings Grid -->
+        <div class="bookings-grid" id="bookingsContainer">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading your bookings...</p>
+            </div>
+        </div>
+
+        <!-- Empty State (Hidden initially) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-calendar-times"></i>
+            <h3>No Bookings Found</h3>
+            <p>You haven't made any bookings yet. Start exploring our hotels!</p>
+            <button class="btn btn-primary" onclick="window.location.href='hotels.html'" style="margin-top: 1rem;">
+                <i class="fas fa-hotel"></i> Browse Hotels
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 EthioHotel. All rights reserved.</p>
+        <p>Part of Ethiopia's Tourism Management System</p>
+    </footer>
+
+    <!-- Cancel Booking Modal -->
+    <div class="modal" id="cancelModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancel Booking</h2>
+                <button class="close-modal" onclick="closeCancelModal()">&times;</button>
+            </div>
+
+            <div class="cancel-confirmation">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Are you sure?</h3>
+                <p>You are about to cancel your booking at <strong id="cancelHotelName"></strong>.</p>
+                <p>Check-in: <strong id="cancelCheckin"></strong></p>
+
+                <div class="refund-info" id="refundInfo">
+                    <h4>Cancellation Policy</h4>
+                    <p>Cancellation more than 48 hours before check-in: Full refund</p>
+                    <p>Cancellation within 48 hours of check-in: 50% refund</p>
+                    <p>Cancellation on or after check-in day: No refund</p>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Cancellation Reason
+                        (Optional)</label>
+                    <select id="cancelReason"
+                        style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem;">
+                        <option value="">Select a reason</option>
+                        <option value="change_plans">Change of plans</option>
+                        <option value="found_cheaper">Found cheaper option</option>
+                        <option value="travel_issues">Travel issues</option>
+                        <option value="personal_reasons">Personal reasons</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <textarea id="cancelReasonOther"
+                        style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; margin-top: 0.5rem; display: none;"
+                        rows="2" placeholder="Please specify..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeCancelModal()">Go Back</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmCancelBooking()">
+                        <i class="fas fa-times"></i> Cancel Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration - REMOVED TOKEN_KEY
+        const API_BASE = '/api';
+
+        // Global variables
+        let currentUser = null;
+        let allBookings = [];
+        let currentBookingToCancel = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function () {
+            // First, check session and update user display
+            await loadUserInfo();
+
+            // Then load bookings
+            await loadBookings();
+
+            setupEventListeners();
+        });
+
+        // Load user info from session
+        async function loadUserInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/session`, {
+                    method: 'GET',
+                    credentials: 'include' // IMPORTANT: Include cookies
+                });
+
+                if (response.ok) {
+                    const session = await response.json();
+                    if (session.user) {
+                        updateUserDisplay(session.user);
+                        currentUser = session.user;
+                        return session.user;
+                    }
+                }
+                return null;
+
+            } catch (error) {
+                console.log('Could not load user info:', error);
+                return null;
+            }
+        }
+
+        function updateUserDisplay(user) {
+            const avatar = document.getElementById('userAvatar');
+            const name = document.getElementById('userName');
+
+            if (user) {
+                // Get initials from name or email
+                let initials = 'U';
+                if (user.first_name && user.last_name) {
+                    initials = (user.first_name.charAt(0) + user.last_name.charAt(0)).toUpperCase();
+                } else if (user.name) {
+                    const nameParts = user.name.split(' ');
+                    if (nameParts.length >= 2) {
+                        initials = (nameParts[0].charAt(0) + nameParts[1].charAt(0)).toUpperCase();
+                    } else {
+                        initials = nameParts[0].charAt(0).toUpperCase();
+                    }
+                } else if (user.email) {
+                    initials = user.email.charAt(0).toUpperCase();
+                }
+
+                avatar.textContent = initials;
+
+                // Display name
+                if (user.first_name && user.last_name) {
+                    name.textContent = `${user.first_name} ${user.last_name}`;
+                } else if (user.name) {
+                    name.textContent = user.name;
+                } else if (user.email) {
+                    name.textContent = user.email.split('@')[0];
+                } else {
+                    name.textContent = 'User';
+                }
+            }
+        }
+
+        // Load bookings from API using session auth
+        async function loadBookings() {
+            try {
+                console.log('Loading bookings from APIs...');
+
+                // Fetch both booking types in parallel
+                const [hotelRes, integrationRes] = await Promise.all([
+                    fetch(`${API_BASE}/bookings`, { method: 'GET', credentials: 'include' }),
+                    fetch(`${API_BASE}/integration-bookings`, { method: 'GET', credentials: 'include' })
+                ]);
+
+                allBookings = [];
+
+                // Process Hotel Bookings
+                if (hotelRes.ok) {
+                    const data = await hotelRes.json();
+                    let hotelBookings = [];
+                    if (Array.isArray(data)) {
+                        hotelBookings = data;
+                    } else if (data.bookings) {
+                        hotelBookings = data.bookings;
+                    } else if (data.data) {
+                        hotelBookings = data.data;
+                    }
+
+                    // Add type tag
+                    hotelBookings.forEach(b => b.type = 'hotel');
+                    allBookings = [...allBookings, ...hotelBookings];
+                }
+
+                // Process Integration Bookings
+                if (integrationRes.ok) {
+                    const result = await integrationRes.json();
+                    const intBookings = result.data || [];
+
+                    if (Array.isArray(intBookings)) {
+                        const mappedBookings = intBookings.map(b => {
+                            // Map integration fields to unified structure
+                            let title = (b.service_type.charAt(0).toUpperCase() + b.service_type.slice(1)) + ' Service';
+                            let date = b.booked_at;
+                            let details = '';
+                            let price = 0;
+
+                            // Parse request data for better details
+                            if (b.request_data) {
+                                try {
+                                    const req = (typeof b.request_data === 'string') ? JSON.parse(b.request_data) : b.request_data;
+
+                                    if (b.service_type === 'taxi') {
+                                        title = 'Taxi Ride';
+                                        details = `${req.pickup_location} → ${req.dropoff_location}`;
+                                        date = req.pickup_time || b.booked_at;
+                                    } else if (b.service_type === 'restaurant') {
+                                        title = 'Table Reservation';
+                                        details = `Party of ${req.party_size || '?'}`;
+                                        date = req.reservation_time || b.booked_at;
+                                    } else if (b.service_type === 'tour') {
+                                        title = 'Tour Booking';
+                                        // Try to find tour name if possible, otherwise generic
+                                        details = `${req.participants || 1} People`;
+                                        date = req.tour_date || b.booked_at;
+                                    }
+                                } catch (e) { }
+                            }
+
+                            return {
+                                id: b.id,
+                                external_id: b.external_booking_id,
+                                type: b.service_type,
+                                hotel_name: title, // Map to hotel_name for card display
+                                room_type: details || b.service_type, // Map to room_type
+                                check_in_date: date,
+                                check_out_date: null, // Single day events usually
+                                status: b.status || 'confirmed',
+                                total_price: price, // Integration often doesn't return price in list
+                                created_at: b.booked_at,
+                                is_integration: true
+                            };
+                        });
+                        allBookings = [...allBookings, ...mappedBookings];
+                    }
+                }
+
+                console.log(`Found ${allBookings.length} total bookings`);
+
+                if (allBookings.length === 0) {
+                    showEmptyState();
+                } else {
+                    displayBookings(allBookings);
+                }
+
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                showNotification('Failed to load bookings: ' + error.message, true);
+                showEmptyState();
+            }
+        }
+
+        // Display bookings
+        function displayBookings(bookings) {
+            const container = document.getElementById('bookingsContainer');
+
+            // Hide loading
+            const loading = container.querySelector('.loading');
+            if (loading) loading.style.display = 'none';
+
+            if (!bookings || bookings.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            // Clear container
+            container.innerHTML = '';
+
+            // Sort bookings by check-in date (newest first)
+            bookings.sort((a, b) => new Date(b.check_in_date) - new Date(a.check_in_date));
+
+            // Create booking cards
+            bookings.forEach(booking => {
+                const bookingCard = createBookingCard(booking);
+                container.appendChild(bookingCard);
+            });
+
+            // Hide empty state
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        // Create booking card HTML
+        function createBookingCard(booking) {
+            const card = document.createElement('div');
+            card.className = 'booking-card';
+
+            // Common variables
+            const checkinDate = new Date(booking.check_in_date);
+            const today = new Date();
+            const daysUntil = Math.ceil((checkinDate - today) / (1000 * 60 * 60 * 24));
+
+            // Status Logic
+            let statusClass = 'status-confirmed';
+            let statusText = booking.status || 'Confirmed';
+
+            if (booking.status === 'cancelled') {
+                statusClass = 'status-cancelled';
+                statusText = 'Cancelled';
+            } else if (booking.status === 'completed' || daysUntil < 0) {
+                statusClass = 'status-completed';
+                statusText = 'Completed';
+            } else if (booking.status === 'pending') {
+                statusClass = 'status-pending';
+                statusText = 'Pending';
+            }
+
+            // --- INTEGRATION BOOKING CARD ---
+            if (booking.is_integration) {
+                const serviceIcon = booking.type === 'taxi' ? 'fa-taxi' :
+                    booking.type === 'tour' ? 'fa-map-marked-alt' : 'fa-utensils';
+
+                card.innerHTML = `
+                    <div class="booking-header" style="background: var(--gradient-primary);">
+                        <div class="booking-id">Ref: ${booking.external_id || booking.id}</div>
+                        <h3><i class="fas ${serviceIcon}"></i> ${booking.hotel_name}</h3>
+                        <div class="booking-status ${statusClass}">${statusText}</div>
+                    </div>
+                    
+                    <div class="booking-body">
+                        <div class="booking-info">
+                            <div class="booking-info-item">
+                                <span class="booking-info-label">Service Date:</span>
+                                <span class="booking-info-value">${checkinDate.toLocaleDateString()} ${checkinDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div class="booking-info-item">
+                                <span class="booking-info-label">Details:</span>
+                                <span class="booking-info-value">${booking.room_type || 'N/A'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="booking-amount">
+                            ${booking.total_price > 0 ? '$' + parseFloat(booking.total_price).toFixed(2) : ''}
+                        </div>
+                        
+                        <div class="booking-actions">
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-info-circle"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return card;
+            }
+
+            // --- HOTEL BOOKING CARD ---
+            const checkoutDate = new Date(booking.check_out_date);
+            const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+            const canCancel = (booking.status === 'confirmed' || booking.status === 'pending') && daysUntil > 0;
+
+            card.innerHTML = `
+                <div class="booking-header">
+                    <div class="booking-id">Booking #${booking.id || 'N/A'}</div>
+                    <h3>${booking.hotel_name || 'Hotel'}</h3>
+                    <div class="booking-status ${statusClass}">${statusText}</div>
+                </div>
+                
+                <div class="booking-body">
+                    <div class="booking-info">
+                        <div class="booking-info-item">
+                            <span class="booking-info-label">Location:</span>
+                            <span class="booking-info-value">${booking.hotel_city || 'City not specified'}</span>
+                        </div>
+                        <div class="booking-info-item">
+                            <span class="booking-info-label">Room:</span>
+                            <span class="booking-info-value">${booking.room_type || 'Standard'} - ${booking.room_number || 'Room'}</span>
+                        </div>
+                        <div class="booking-info-item">
+                            <span class="booking-info-label">Check-in:</span>
+                            <span class="booking-info-value">${formatDate(booking.check_in_date)}</span>
+                        </div>
+                        <div class="booking-info-item">
+                            <span class="booking-info-label">Check-out:</span>
+                            <span class="booking-info-value">${formatDate(booking.check_out_date)}</span>
+                        </div>
+                        <div class="booking-info-item">
+                            <span class="booking-info-label">Guests:</span>
+                            <span class="booking-info-value">${booking.adults || 1} adult${booking.adults > 1 ? 's' : ''}${booking.children > 0 ? ', ' + booking.children + ' child' + (booking.children > 1 ? 'ren' : '') : ''}</span>
+                        </div>
+                        <div class="booking-info-item">
+                            <span class="booking-info-label">Duration:</span>
+                            <span class="booking-info-value">${nights} night${nights > 1 ? 's' : ''}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-amount">
+                        $${parseFloat(booking.total_price || 0).toFixed(2)}
+                    </div>
+                    
+                    <div class="booking-actions">
+                        ${canCancel ? `
+                            <button class="btn btn-danger" onclick="openCancelModal(${booking.id})" ${daysUntil < 1 ? 'disabled title="Cannot cancel on check-in day"' : ''}>
+                                <i class="fas fa-times"></i> Cancel Booking
+                            </button>
+                        ` : `
+                            <button class="btn btn-secondary" onclick="viewBookingDetails(${booking.id})">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Show empty state
+        function showEmptyState() {
+            const container = document.getElementById('bookingsContainer');
+            const loading = container.querySelector('.loading');
+
+            if (loading) loading.style.display = 'none';
+
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        // Filter bookings
+        function filterBookings(filter) {
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            let filteredBookings = [...allBookings];
+
+            switch (filter) {
+                case 'confirmed':
+                    filteredBookings = allBookings.filter(b =>
+                        b.status === 'confirmed' || (!b.status && new Date(b.check_in_date) > new Date())
+                    );
+                    break;
+
+                case 'pending':
+                    filteredBookings = allBookings.filter(b => b.status === 'pending');
+                    break;
+
+                case 'cancelled':
+                    filteredBookings = allBookings.filter(b => b.status === 'cancelled');
+                    break;
+
+                case 'completed':
+                    filteredBookings = allBookings.filter(b =>
+                        b.status === 'completed' || new Date(b.check_in_date) < new Date()
+                    );
+                    break;
+
+                case 'upcoming':
+                    filteredBookings = allBookings.filter(b =>
+                        (b.status === 'confirmed' || !b.status) && new Date(b.check_in_date) > new Date()
+                    );
+                    break;
+
+                default:
+                    // 'all' - show all bookings
+                    break;
+            }
+
+            displayBookings(filteredBookings);
+        }
+
+        // Open cancel modal
+        function openCancelModal(bookingId) {
+            const booking = allBookings.find(b => b.id == bookingId);
+            if (!booking) {
+                showNotification('Booking not found', true);
+                return;
+            }
+
+            currentBookingToCancel = booking;
+
+            // Fill cancel modal
+            document.getElementById('cancelHotelName').textContent = booking.hotel_name || 'Hotel';
+            document.getElementById('cancelCheckin').textContent = formatDate(booking.check_in_date);
+
+            // Calculate refund info
+            const checkinDate = new Date(booking.check_in_date);
+            const today = new Date();
+            const hoursUntil = (checkinDate - today) / (1000 * 60 * 60);
+
+            const refundInfo = document.getElementById('refundInfo');
+            if (hoursUntil > 48) {
+                refundInfo.innerHTML = `
+                    <h4>Full Refund Available</h4>
+                    <p>Cancelling more than 48 hours before check-in qualifies for a full refund of $${parseFloat(booking.total_price || 0).toFixed(2)}.</p>
+                `;
+            } else if (hoursUntil > 0) {
+                refundInfo.innerHTML = `
+                    <h4>Partial Refund Available</h4>
+                    <p>Cancelling within 48 hours of check-in qualifies for a 50% refund of $${(parseFloat(booking.total_price || 0) * 0.5).toFixed(2)}.</p>
+                `;
+            } else {
+                refundInfo.innerHTML = `
+                    <h4>No Refund Available</h4>
+                    <p>Cancelling on or after check-in date does not qualify for a refund.</p>
+                `;
+            }
+
+            // Show modal
+            document.getElementById('cancelModal').classList.add('active');
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancelModal').classList.remove('active');
+            currentBookingToCancel = null;
+            document.getElementById('cancelReasonOther').style.display = 'none';
+        }
+
+        // Confirm cancellation - UPDATED for session auth
+        async function confirmCancelBooking() {
+            if (!currentBookingToCancel) return;
+
+            const reason = document.getElementById('cancelReason').value;
+            const otherReason = document.getElementById('cancelReasonOther').value;
+            const cancellationReason = reason === 'other' ? otherReason : reason;
+
+            try {
+                // Try to cancel via POST /api/bookings/{id}/cancel with session auth
+                console.log(`Cancelling booking ${currentBookingToCancel.id}...`);
+
+                const response = await fetch(`${API_BASE}/bookings/${currentBookingToCancel.id}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include', // IMPORTANT: This sends session cookies
+                    body: JSON.stringify({
+                        reason: cancellationReason
+                    })
+                });
+
+                console.log('Cancel response status:', response.status);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Cancel successful:', result);
+
+                    // Update local booking status
+                    const bookingIndex = allBookings.findIndex(b => b.id == currentBookingToCancel.id);
+                    if (bookingIndex !== -1) {
+                        allBookings[bookingIndex].status = 'cancelled';
+                        allBookings[bookingIndex].cancellation_reason = cancellationReason;
+                        allBookings[bookingIndex].cancellation_date = new Date().toISOString();
+                    }
+
+                    closeCancelModal();
+                    showNotification('Booking cancelled successfully!');
+
+                    // Refresh display
+                    filterBookings('all');
+
+                } else {
+                    // If POST fails, try PATCH as fallback with session auth
+                    console.log('POST /cancel failed, trying PATCH...');
+
+                    const patchResponse = await fetch(`${API_BASE}/bookings/${currentBookingToCancel.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include', // IMPORTANT: This sends session cookies
+                        body: JSON.stringify({
+                            status: 'cancelled',
+                            cancellation_reason: cancellationReason
+                        })
+                    });
+
+                    if (patchResponse.ok) {
+                        const result = await patchResponse.json();
+                        console.log('Cancel via PATCH successful:', result);
+
+                        // Update local booking
+                        const bookingIndex = allBookings.findIndex(b => b.id == currentBookingToCancel.id);
+                        if (bookingIndex !== -1) {
+                            allBookings[bookingIndex].status = 'cancelled';
+                            allBookings[bookingIndex].cancellation_reason = cancellationReason;
+                            allBookings[bookingIndex].cancellation_date = new Date().toISOString();
+                        }
+
+                        closeCancelModal();
+                        showNotification('Booking cancelled successfully!');
+                        filterBookings('all');
+
+                    } else {
+                        // If both methods fail, show error
+                        const errorText = await patchResponse.text();
+                        throw new Error(`Cancel failed: ${errorText}`);
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error cancelling booking:', error);
+                showNotification('Failed to cancel booking: ' + error.message, true);
+            }
+        }
+
+        // View booking details
+        function viewBookingDetails(bookingId) {
+            const booking = allBookings.find(b => b.id == bookingId);
+            if (!booking) return;
+
+            // Show detailed view in a modal
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+
+            const checkinDate = new Date(booking.check_in_date);
+            const checkoutDate = new Date(booking.check_out_date);
+            const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+            const today = new Date();
+            const daysUntil = Math.ceil((checkinDate - today) / (1000 * 60 * 60 * 24));
+
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h2>Booking Details</h2>
+                        <button class="close-modal" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                    </div>
+                    
+                    <div style="padding: 1rem 0;">
+                        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px;">
+                            <h3 style="margin-bottom: 1rem;">${booking.hotel_name || 'Hotel'}</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <p><strong>Booking ID:</strong> ${booking.id}</p>
+                                    <p><strong>Room Type:</strong> ${booking.room_type || 'Standard'}</p>
+                                    <p><strong>Room Number:</strong> ${booking.room_number || 'Room'}</p>
+                                    <p><strong>Location:</strong> ${booking.hotel_city || 'Not specified'}</p>
+                                </div>
+                                <div>
+                                    <p><strong>Status:</strong> <span class="booking-status ${getStatusClass(booking)}">${booking.status || 'Confirmed'}</span></p>
+                                    <p><strong>Check-in:</strong> ${formatDate(booking.check_in_date)}</p>
+                                    <p><strong>Check-out:</strong> ${formatDate(booking.check_out_date)}</p>
+                                    <p><strong>Nights:</strong> ${nights}</p>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+                                <p><strong>Guests:</strong> ${booking.adults || 1} adult${booking.adults > 1 ? 's' : ''}${booking.children > 0 ? ', ' + booking.children + ' children' : ''}</p>
+                                <p><strong>Total Amount:</strong> $${parseFloat(booking.total_price || 0).toFixed(2)}</p>
+                                <p><strong>Days until check-in:</strong> ${daysUntil > 0 ? daysUntil + ' days' : 'Past stay'}</p>
+                                ${booking.created_at ? `<p><strong>Booked On:</strong> ${formatDate(booking.created_at)}</p>` : ''}
+                            </div>
+                            
+                            ${booking.special_requests ? `
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+                                    <p><strong>Special Requests:</strong></p>
+                                    <p>${booking.special_requests}</p>
+                                </div>
+                            ` : ''}
+                            
+                            ${booking.cancellation_reason ? `
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd; background: #ffebee; padding: 1rem; border-radius: 5px;">
+                                    <p><strong>Cancellation Reason:</strong> ${booking.cancellation_reason}</p>
+                                    ${booking.cancellation_date ? `<p><strong>Cancelled On:</strong> ${formatDate(booking.cancellation_date)}</p>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        }
+
+        function getStatusClass(booking) {
+            const checkinDate = new Date(booking.check_in_date);
+            const today = new Date();
+            const daysUntil = Math.ceil((checkinDate - today) / (1000 * 60 * 60 * 24));
+
+            if (booking.status === 'cancelled') return 'status-cancelled';
+            if (booking.status === 'completed' || daysUntil < 0) return 'status-completed';
+            if (booking.status === 'pending') return 'status-pending';
+            return 'status-confirmed';
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Cancel reason selection
+            document.getElementById('cancelReason').addEventListener('change', function () {
+                const otherText = document.getElementById('cancelReasonOther');
+                otherText.style.display = this.value === 'other' ? 'block' : 'none';
+            });
+        }
+
+        // Call setup event listeners
+        setupEventListeners();
+
+        // Notification function
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${isError ? 'error' : ''}`;
+            notification.innerHTML = `
+                <i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
+                ${message}
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Listen for booking created events (from hotel.html)
+        window.addEventListener('bookingCreated', function (event) {
+            console.log('Booking created event received:', event.detail);
+            // Refresh bookings list
+            loadBookings();
+        });
+    </script>
+</body>
+
+</html>

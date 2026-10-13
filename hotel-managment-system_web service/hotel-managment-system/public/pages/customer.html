@@ -1,0 +1,3823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EthioHotel | Customer Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #1a1a2e;
+            --gray: #7f8c8d;
+            --hotel: #2c3e50;
+            --restaurant: #e74c3c;
+            --taxi: #f39c12;
+            --tour: #3498db;
+            --bookings: #1a1a2e;
+            --gradient-primary: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            --gradient-secondary: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            --gradient-warning: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            --gradient-success: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            --gradient-tour: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            --gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #2c3e50 100%);
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1.2rem 2rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .logo-icon:hover {
+            transform: rotate(15deg) scale(1.05);
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text span {
+            font-size: 1rem;
+            display: block;
+            font-weight: 400;
+            margin-top: -5px;
+            color: var(--gray);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 50px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+            border: 3px solid white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .user-role {
+            font-size: 0.85rem;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dropdown-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .dropdown-btn:hover {
+            color: var(--primary);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            color: var(--gray);
+        }
+
+        .dropdown-item:hover i {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 1400px;
+            margin: 2.5rem auto;
+            padding: 0 2rem;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .welcome-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-primary);
+        }
+
+        .welcome-card h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-card p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .user-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: var(--light);
+            padding: 1.2rem 2rem;
+            border-radius: var(--radius);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 150px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            background: white;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Services Section */
+        .services-section {
+            max-width: 1400px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+            background: rgba(44, 62, 80, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2.2rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .service-card.hotel:hover {
+            border-color: var(--hotel);
+        }
+
+        .service-card.restaurant:hover {
+            border-color: var(--restaurant);
+        }
+
+        .service-card.taxi:hover {
+            border-color: var(--taxi);
+        }
+
+        .service-card.tour:hover {
+            border-color: var(--tour);
+        }
+
+        .service-card.bookings:hover {
+            border-color: var(--bookings);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .service-card.hotel .service-icon {
+            background: var(--gradient-primary);
+        }
+
+        .service-card.restaurant .service-icon {
+            background: var(--gradient-secondary);
+        }
+
+        .service-card.taxi .service-icon {
+            background: var(--gradient-warning);
+        }
+
+        .service-card.tour .service-icon {
+            background: var(--gradient-tour);
+        }
+
+        .service-card.bookings .service-icon {
+            background: var(--gradient-dark);
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .service-card p {
+            color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+        }
+
+        .service-tag {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .service-card.hotel .service-tag {
+            background: rgba(44, 62, 80, 0.1);
+            color: var(--hotel);
+        }
+
+        .service-card.restaurant .service-tag {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--restaurant);
+        }
+
+        .service-card.taxi .service-tag {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--taxi);
+        }
+
+        .service-card.tour .service-tag {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--tour);
+        }
+
+        .service-card.bookings .service-tag {
+            background: rgba(26, 26, 46, 0.1);
+            color: var(--bookings);
+        }
+
+        /* Activity & Profile Section */
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .activity-card,
+        .profile-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-card::before,
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-primary);
+        }
+
+        .profile-card::before {
+            background: var(--gradient-success);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h3 i {
+            color: var(--primary);
+        }
+
+        .card-header .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .card-header .view-all:hover {
+            gap: 8px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1.2rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .activity-item.new::after {
+            content: 'NEW';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .activity-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .activity-content p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Profile Info */
+        .profile-info {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin: 0 auto 1rem;
+            border: 5px solid white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .profile-email {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1.2rem;
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .profile-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .detail-item:hover {
+            background: #e9ecef;
+        }
+
+        .detail-item i {
+            width: 20px;
+            color: var(--primary);
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .detail-value {
+            margin-left: auto;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .action-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .action-btn.secondary {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--primary);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 4rem;
+            padding: 2.5rem 2rem;
+            background: var(--dark);
+            color: white;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .footer-logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        /* Taxi Booking Modal */
+        .taxi-modal .modal-content,
+        .tour-modal .modal-content {
+            max-width: 600px;
+        }
+
+        .taxi-service-options,
+        .tour-service-options {
+            display: grid;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .taxi-option,
+        .tour-option {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .taxi-option:hover {
+            border-color: var(--taxi);
+            background: rgba(243, 156, 18, 0.05);
+        }
+
+        .tour-option:hover {
+            border-color: var(--tour);
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .taxi-option.selected {
+            border-color: var(--taxi);
+            background: rgba(243, 156, 18, 0.1);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.1);
+        }
+
+        .tour-option.selected {
+            border-color: var(--tour);
+            background: rgba(52, 152, 219, 0.1);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.1);
+        }
+
+        .taxi-option-header,
+        .tour-option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .taxi-type,
+        .tour-type {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+
+        .taxi-price {
+            font-weight: 700;
+            color: var(--taxi);
+            font-size: 1.2rem;
+        }
+
+        .tour-price {
+            font-weight: 700;
+            color: var(--tour);
+            font-size: 1.2rem;
+        }
+
+        .taxi-description,
+        .tour-description {
+            color: var(--gray);
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .taxi-details,
+        .tour-details {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+            flex-wrap: wrap;
+        }
+
+        .taxi-details span,
+        .tour-details span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .taxi-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--taxi);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .tour-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--tour);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .taxi-estimate,
+        .tour-estimate {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .estimate-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+
+        .estimate-total {
+            border-top: 2px solid #e0e0e0;
+            padding-top: 0.8rem;
+            margin-top: 0.8rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .taxi-loading,
+        .tour-loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Booking Steps */
+        .booking-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .booking-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .step.active .step-number {
+            background: var(--taxi);
+            color: white;
+        }
+
+        .tour-step.active .step-number {
+            background: var(--tour);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-align: center;
+        }
+
+        .step.active .step-label,
+        .tour-step.active .step-label {
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        /* Ride Details Form */
+        .ride-details {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--accent);
+            transform: rotate(90deg);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .service-card {
+            animation: fadeIn 0.6s ease backwards;
+        }
+
+        .service-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .service-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .service-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .service-card:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .service-card:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .user-profile {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-card h1 {
+                font-size: 2.2rem;
+            }
+
+            .user-stats {
+                gap: 15px;
+            }
+
+            .stat-item {
+                min-width: 120px;
+                padding: 1rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .footer-links {
+                flex-wrap: wrap;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .taxi-modal .modal-content,
+            .tour-modal .modal-content {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .hero,
+            .services-section,
+            .dashboard-content {
+                padding: 0 1rem;
+            }
+
+            .welcome-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .service-card,
+            .activity-card,
+            .profile-card {
+                padding: 1.8rem;
+            }
+        }
+
+        /* Error and Success Messages */
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            text-align: center;
+            display: none;
+        }
+
+        .modal-content .form-message {
+            margin: 1rem 0;
+        }
+
+        /* Disabled button state */
+        .action-btn:disabled,
+        .modal button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Button with spinner */
+        .btn-with-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.3s ease;
+            max-width: 350px;
+        }
+
+        .toast.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .toast.error {
+            background: var(--accent);
+            color: white;
+        }
+
+        .toast.warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-required {
+            color: var(--accent);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            padding-right: 30px;
+            /* Space for close button */
+        }
+
+        /* Service Status Indicators */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+        }
+
+        .status-offline {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--accent);
+        }
+
+        .status-simulated {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning);
+        }
+
+        .status-loading {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-online .status-dot {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .status-offline .status-dot {
+            background: var(--accent);
+        }
+
+        .status-simulated .status-dot {
+            background: var(--warning);
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo" onclick="window.location.href='customer.html'">
+                <div class="logo-icon">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <div class="logo-text">
+                    EthioHotel
+                    <span>Customer Dashboard</span>
+                </div>
+            </div>
+
+            <div class="user-info">
+                <div class="user-profile" onclick="toggleDropdown()">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <div class="user-role">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userRole">Customer</span>
+                        </div>
+                    </div>
+                    <button class="dropdown-btn">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <div class="dropdown-item" onclick="showProfileModal()">
+                            <i class="fas fa-user"></i>
+                            My Profile
+                        </div>
+                        <div class="dropdown-item" onclick="window.location.href='mybookings.html'">
+                            <i class="fas fa-calendar-check"></i>
+                            My Bookings
+                        </div>
+                        <div class="dropdown-item" onclick="window.location.href='hotels.html'">
+                            <i class="fas fa-hotel"></i>
+                            Book Hotel
+                        </div>
+                        <div class="dropdown-item" onclick="showTaxiBookingModal()">
+                            <i class="fas fa-taxi"></i>
+                            Book Taxi
+                        </div>
+                        <div class="dropdown-item" onclick="showTourBookingModal()">
+                            <i class="fas fa-map-marked-alt"></i>
+                            Book Tour
+                        </div>
+                        <div class="dropdown-item" onclick="window.location.href='services.html'">
+                            <i class="fas fa-concierge-bell"></i>
+                            All Services
+                        </div>
+                        <div class="dropdown-item" onclick="window.location.href='integration-test.html'">
+                            <i class="fas fa-vial"></i>
+                            Integration Test
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="welcome-card">
+            <h1 id="welcomeMessage">Welcome Back!</h1>
+            <p>Experience Ethiopia's finest hospitality. Book hotels, restaurants, transportation, and tours with ease.
+            </p>
+
+            <div class="user-stats">
+                <div class="stat-item" onclick="window.location.href='mybookings.html'">
+                    <div class="stat-value" id="totalBookings">0</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+                <div class="stat-item" onclick="window.location.href='mybookings.html?filter=active'">
+                    <div class="stat-value" id="activeBookings">0</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-item" onclick="showTaxiBookingModal()">
+                    <div class="stat-value" id="taxiBookings">0</div>
+                    <div class="stat-label">Taxi Rides</div>
+                </div>
+                <div class="stat-item" onclick="showTourBookingModal()">
+                    <div class="stat-value" id="tourBookings">0</div>
+                    <div class="stat-label">Tours Booked</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-concierge-bell"></i>
+                Our Services
+            </h2>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="status-indicator status-loading" id="apiStatus">
+                    <span class="status-dot"></span>
+                    <span>Loading API status...</span>
+                </div>
+                <p style="color: var(--gray);">Click on any service to book</p>
+            </div>
+        </div>
+
+        <div class="services-grid">
+            <!-- Hotel Service -->
+            <div class="service-card hotel" onclick="window.location.href='hotels.html'">
+                <div class="service-icon">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <h3>Hotel Booking</h3>
+                <p>Find and book premium accommodations across Ethiopia with exclusive member rates.</p>
+                <span class="service-tag">Best Price Guarantee</span>
+            </div>
+
+            <!-- Restaurant Service -->
+            <div class="service-card restaurant" onclick="window.location.href='services.html?service=restaurant'">
+                <div class="service-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h3>Restaurant Reservations</h3>
+                <p>Secure tables at top-rated Ethiopian restaurants with special dining offers.</p>
+                <span class="service-tag">Priority Seating</span>
+            </div>
+
+            <!-- Taxi Service -->
+            <div class="service-card taxi" onclick="showTaxiBookingModal()">
+                <div class="service-icon">
+                    <i class="fas fa-taxi"></i>
+                </div>
+                <h3>Transportation</h3>
+                <p>Reliable airport transfers and city transportation with professional drivers.</p>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+                    <span class="service-tag" id="taxiCount">Taxi Service</span>
+                    <div class="status-indicator status-loading" id="taxiServiceStatus">
+                        <span class="status-dot"></span>
+                        <span>Checking...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tour Service -->
+            <div class="service-card tour" onclick="showTourBookingModal()">
+                <div class="service-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3>Tour Packages</h3>
+                <p>Curated cultural experiences and guided tours across Ethiopia's heritage sites.</p>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+                    <span class="service-tag" id="tourCount">Tour Service</span>
+                    <div class="status-indicator status-loading" id="tourServiceStatus">
+                        <span class="status-dot"></span>
+                        <span>Checking...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Bookings Service -->
+            <div class="service-card bookings" onclick="window.location.href='mybookings.html'">
+                <div class="service-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>My Bookings</h3>
+                <p>View, manage, and cancel your current and past hotel reservations.</p>
+                <span class="service-tag">Manage Reservations</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Activity & Profile Section -->
+    <section class="dashboard-content">
+        <!-- Activity Section -->
+        <div class="activity-card">
+            <div class="card-header">
+                <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                <div class="view-all" onclick="window.location.href='mybookings.html'">
+                    View All
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+            <div class="activity-list" id="activityList">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="profile-card">
+            <div class="card-header">
+                <h3><i class="fas fa-user-circle"></i> My Profile</h3>
+            </div>
+
+            <div class="profile-info">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <h3 class="profile-name" id="profileName">Loading...</h3>
+                <p class="profile-email" id="profileEmail">Loading...</p>
+                <div class="profile-badge">
+                    <i class="fas fa-star"></i>
+                    <span id="membershipLevel">Verified Member</span>
+                </div>
+            </div>
+
+            <div class="profile-details">
+                <div class="detail-item">
+                    <i class="fas fa-phone"></i>
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value" id="profilePhone">Not set</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-calendar"></i>
+                    <span class="detail-label">Member Since</span>
+                    <span class="detail-value" id="memberSince">2024</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-user-tag"></i>
+                    <span class="detail-label">Account Type</span>
+                    <span class="detail-value" id="profileRole">Customer</span>
+                </div>
+                <div class="detail-item" onclick="showTourBookingModal()"
+                    style="cursor: pointer; background: rgba(52, 152, 219, 0.1);">
+                    <i class="fas fa-map-marked-alt" style="color: var(--tour);"></i>
+                    <span class="detail-label" style="color: var(--tour);">Book Tour</span>
+                    <span class="detail-value">
+                        <i class="fas fa-arrow-right" style="color: var(--tour);"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="window.location.href='mybookings.html'">
+                    <i class="fas fa-calendar-check"></i>
+                    My Bookings
+                </button>
+                <button class="action-btn secondary" onclick="showTourBookingModal()">
+                    <i class="fas fa-map-marked-alt"></i>
+                    Book Tour
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <div class="footer-logo-icon">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <div class="footer-logo-text">EthioHotel</div>
+            </div>
+            <p style="color: rgba(255, 255, 255, 0.8); max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                Ethiopia's premier hospitality management system. Experience exceptional service across hotels,
+                restaurants, and tours.
+            </p>
+
+            <div class="footer-links">
+                <a href="#" onclick="showAboutModal()"><i class="fas fa-info-circle"></i> About Us</a>
+                <a href="#" onclick="showContactModal()"><i class="fas fa-phone"></i> Contact Support</a>
+                <a href="#" onclick="showPrivacyModal()"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+                <a href="#" onclick="showTermsModal()"><i class="fas fa-file-contract"></i> Terms of Service</a>
+                <a href="integration-test.html"><i class="fas fa-vial"></i> Integration Test</a>
+                <a href="api-docs.html"><i class="fas fa-book"></i> API Docs</a>
+            </div>
+
+            <div class="copyright">
+                © 2024 EthioHotel Management System. All rights reserved.<br>
+                Part of Ethiopia's Digital Hospitality Initiative<br>
+                Group 2 - Hotel Management System | Integrated with Groups 1, 3, 4, 5, 7, 8, 9
+            </div>
+        </div>
+    </footer>
+
+    <!-- Taxi Booking Modal -->
+    <div class="modal taxi-modal" id="taxiModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeTaxiModal()">&times;</button>
+            <h2 style="margin-bottom: 1.5rem; color: var(--dark); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-taxi"></i>
+                Book Taxi Service
+            </h2>
+
+            <!-- Booking Steps -->
+            <div class="booking-steps">
+                <div class="step active" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Select Service</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Ride Details</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Confirmation</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Select Taxi Service -->
+            <div id="step1Content">
+                <div class="taxi-loading" id="taxiLoading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 1rem; color: var(--gray);">Loading available taxi services...</p>
+                </div>
+
+                <div class="taxi-service-options" id="taxiOptions" style="display: none;">
+                    <!-- Taxi options will be loaded here -->
+                </div>
+
+                <div id="noTaxiServices" style="display: none; text-align: center; padding: 2rem;">
+                    <i class="fas fa-taxi" style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
+                    <p>No taxi services available at the moment.</p>
+                    <p style="color: var(--gray); font-size: 0.9rem; margin-top: 0.5rem;">Please try again later or
+                        contact support.</p>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" onclick="closeTaxiModal()" class="action-btn secondary" style="flex: 1;">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="goToStep2()" id="nextStepBtn" class="action-btn primary"
+                        style="flex: 1;" disabled>
+                        Next: Ride Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Ride Details -->
+            <div id="step2Content" style="display: none;">
+                <div class="ride-details">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pickupLocation" class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Pickup Location <span class="form-required">*</span>
+                            </label>
+                            <input type="text" id="pickupLocation" class="form-control"
+                                placeholder="Enter pickup address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="destination" class="form-label">
+                                <i class="fas fa-flag-checkered"></i>
+                                Destination <span class="form-required">*</span>
+                            </label>
+                            <input type="text" id="destination" class="form-control" placeholder="Enter destination"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pickupDate" class="form-label">
+                                <i class="fas fa-calendar"></i>
+                                Pickup Date <span class="form-required">*</span>
+                            </label>
+                            <input type="date" id="pickupDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pickupTime" class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Pickup Time <span class="form-required">*</span>
+                            </label>
+                            <input type="time" id="pickupTime" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passengers" class="form-label">
+                            <i class="fas fa-users"></i>
+                            Number of Passengers
+                        </label>
+                        <input type="number" id="passengers" class="form-control" min="1" max="8" value="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specialInstructions" class="form-label">
+                            <i class="fas fa-sticky-note"></i>
+                            Special Instructions
+                        </label>
+                        <textarea id="specialInstructions" class="form-control" rows="3"
+                            placeholder="Any special requirements..."></textarea>
+                    </div>
+                </div>
+
+                <div id="rideEstimate" class="taxi-estimate" style="display: none;">
+                    <h4 style="margin-bottom: 1rem; color: var(--dark);">
+                        <i class="fas fa-calculator"></i>
+                        Fare Estimate
+                    </h4>
+                    <div class="estimate-row">
+                        <span>Base Fare:</span>
+                        <span id="baseFare">$5.00</span>
+                    </div>
+                    <div class="estimate-row">
+                        <span>Distance Charge:</span>
+                        <span id="distanceCharge">$0.00</span>
+                    </div>
+                    <div class="estimate-row">
+                        <span>Service Fee:</span>
+                        <span id="serviceFee">$1.50</span>
+                    </div>
+                    <div class="estimate-row estimate-total">
+                        <span>Total Estimated:</span>
+                        <span id="totalEstimate" style="color: var(--taxi); font-size: 1.3rem;">$6.50</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" onclick="goToStep1()" class="action-btn secondary" style="flex: 1;">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button type="button" onclick="goToStep3()" id="confirmDetailsBtn"
+                        class="action-btn primary btn-with-spinner" style="flex: 1;">
+                        <span id="confirmBtnText">Next: Review & Book</span>
+                        <div class="btn-spinner" id="confirmSpinner"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Confirmation -->
+            <div id="step3Content" style="display: none;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="width: 80px; height: 80px; background: var(--gradient-success); 
+                                border-radius: 50%; display: flex; align-items: center; 
+                                justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fas fa-check" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <h3 style="color: var(--dark); margin-bottom: 0.5rem;">Ready to Book!</h3>
+                    <p style="color: var(--gray);">Review your taxi booking details below</p>
+                </div>
+
+                <div class="ride-details">
+                    <div class="form-group">
+                        <label class="form-label">Selected Service:</label>
+                        <div style="padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span id="reviewServiceType" style="font-weight: 600;"></span>
+                                <span id="reviewServicePrice" style="color: var(--taxi); font-weight: 700;"></span>
+                            </div>
+                            <p id="reviewServiceDescription"
+                                style="color: var(--gray); margin-top: 0.5rem; font-size: 0.95rem;"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Pickup:</label>
+                            <div id="reviewPickup" style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Destination:</label>
+                            <div id="reviewDestination"
+                                style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date & Time:</label>
+                            <div id="reviewDateTime" style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Passengers:</label>
+                            <div id="reviewPassengers"
+                                style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Special Instructions:</label>
+                        <div id="reviewInstructions"
+                            style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px; min-height: 60px;"></div>
+                    </div>
+
+                    <div class="taxi-estimate">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark);">
+                            <i class="fas fa-receipt"></i>
+                            Booking Summary
+                        </h4>
+                        <div class="estimate-row">
+                            <span>Service:</span>
+                            <span id="finalServiceType"></span>
+                        </div>
+                        <div class="estimate-row">
+                            <span>Pickup Time:</span>
+                            <span id="finalPickupTime"></span>
+                        </div>
+                        <div class="estimate-row estimate-total">
+                            <span>Total Amount:</span>
+                            <span id="finalTotal" style="color: var(--taxi); font-size: 1.3rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bookingMessage" class="form-message" style="display: none; margin: 1rem 0;"></div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" onclick="goToStep2()" class="action-btn secondary" style="flex: 1;">
+                        <i class="fas fa-edit"></i>
+                        Edit Details
+                    </button>
+                    <button type="button" onclick="confirmTaxiBooking()" id="bookTaxiBtn"
+                        class="action-btn primary btn-with-spinner" style="flex: 1;">
+                        <span id="bookBtnText">Confirm & Book</span>
+                        <div class="btn-spinner" id="bookSpinner"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tour Booking Modal -->
+    <div class="modal tour-modal" id="tourModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeTourModal()">&times;</button>
+            <h2 style="margin-bottom: 1.5rem; color: var(--dark); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-map-marked-alt"></i>
+                Book Tour Experience
+            </h2>
+
+            <!-- Booking Steps -->
+            <div class="booking-steps">
+                <div class="step tour-step active" id="tourStep1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Select Tour</div>
+                </div>
+                <div class="step tour-step" id="tourStep2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Booking Details</div>
+                </div>
+                <div class="step tour-step" id="tourStep3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Confirmation</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Select Tour -->
+            <div id="tourStep1Content">
+                <div class="tour-loading" id="tourLoading">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 1rem; color: var(--gray);">Loading available tours...</p>
+                </div>
+
+                <div class="tour-service-options" id="tourOptions" style="display: none;">
+                    <!-- Tour options will be loaded here -->
+                </div>
+
+                <div id="noTours" style="display: none; text-align: center; padding: 2rem;">
+                    <i class="fas fa-map-marked-alt"
+                        style="font-size: 3rem; color: var(--gray); margin-bottom: 1rem;"></i>
+                    <p>No tours available at the moment.</p>
+                    <p style="color: var(--gray); font-size: 0.9rem; margin-top: 0.5rem;">Please try again later.</p>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" onclick="closeTourModal()" class="action-btn secondary" style="flex: 1;">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="tourGoToStep2()" id="tourNextStepBtn" class="action-btn primary"
+                        style="flex: 1;" disabled>
+                        Next: Booking Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Booking Details -->
+            <div id="tourStep2Content" style="display: none;">
+                <div class="ride-details">
+                    <div class="form-group">
+                        <label for="tourParticipants" class="form-label">
+                            <i class="fas fa-users"></i>
+                            Number of Participants <span class="form-required">*</span>
+                        </label>
+                        <input type="number" id="tourParticipants" class="form-control" min="1" max="20" value="1"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tourDate" class="form-label">
+                            <i class="fas fa-calendar"></i>
+                            Preferred Tour Date <span class="form-required">*</span>
+                        </label>
+                        <input type="date" id="tourDate" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tourSpecialRequests" class="form-label">
+                            <i class="fas fa-sticky-note"></i>
+                            Special Requests
+                        </label>
+                        <textarea id="tourSpecialRequests" class="form-control" rows="3"
+                            placeholder="Any dietary restrictions, accessibility needs, or special requests..."></textarea>
+                    </div>
+
+                    <div id="tourSummary"
+                        style="background: rgba(52, 152, 219, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--dark);">
+                            <i class="fas fa-info-circle"></i>
+                            Tour Summary
+                        </h4>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Tour:</span>
+                            <span id="selectedTourTitle" style="font-weight: 600;"></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span>Price per person:</span>
+                            <span id="tourPricePerPerson" style="color: var(--tour); font-weight: 700;"></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-weight: 700;">
+                            <span>Total:</span>
+                            <span id="tourTotalPrice" style="color: var(--tour); font-size: 1.2rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" onclick="tourGoToStep1()" class="action-btn secondary" style="flex: 1;">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button type="button" onclick="tourGoToStep3()" id="tourConfirmDetailsBtn"
+                        class="action-btn primary btn-with-spinner" style="flex: 1;">
+                        <span id="tourConfirmBtnText">Next: Review & Book</span>
+                        <div class="btn-spinner" id="tourConfirmSpinner"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Confirmation -->
+            <div id="tourStep3Content" style="display: none;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div style="width: 80px; height: 80px; background: var(--gradient-success); 
+                                border-radius: 50%; display: flex; align-items: center; 
+                                justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fas fa-check" style="color: white; font-size: 2rem;"></i>
+                    </div>
+                    <h3 style="color: var(--dark); margin-bottom: 0.5rem;">Ready to Book Your Tour!</h3>
+                    <p style="color: var(--gray);">Review your tour booking details below</p>
+                </div>
+
+                <div class="ride-details">
+                    <div class="form-group">
+                        <label class="form-label">Selected Tour:</label>
+                        <div style="padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e0e0e0;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span id="reviewTourTitle" style="font-weight: 600;"></span>
+                                <span id="reviewTourPrice" style="color: var(--tour); font-weight: 700;"></span>
+                            </div>
+                            <p id="reviewTourDescription"
+                                style="color: var(--gray); margin-top: 0.5rem; font-size: 0.95rem;"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Participants:</label>
+                            <div id="reviewParticipants"
+                                style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tour Date:</label>
+                            <div id="reviewTourDate" style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Special Requests:</label>
+                        <div id="reviewTourRequests"
+                            style="padding: 0.8rem; background: #f8f9fa; border-radius: 8px; min-height: 60px;"></div>
+                    </div>
+
+                    <div class="tour-estimate">
+                        <h4 style="margin-bottom: 1rem; color: var(--dark);">
+                            <i class="fas fa-receipt"></i>
+                            Booking Summary
+                        </h4>
+                        <div class="estimate-row">
+                            <span>Tour:</span>
+                            <span id="finalTourTitle"></span>
+                        </div>
+                        <div class="estimate-row">
+                            <span>Date:</span>
+                            <span id="finalTourDate"></span>
+                        </div>
+                        <div class="estimate-row">
+                            <span>Participants:</span>
+                            <span id="finalParticipants"></span>
+                        </div>
+                        <div class="estimate-row estimate-total">
+                            <span>Total Amount:</span>
+                            <span id="finalTourTotal" style="color: var(--tour); font-size: 1.3rem;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tourBookingMessage" class="form-message" style="display: none; margin: 1rem 0;"></div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" onclick="tourGoToStep2()" class="action-btn secondary" style="flex: 1;">
+                        <i class="fas fa-edit"></i>
+                        Edit Details
+                    </button>
+                    <button type="button" onclick="confirmTourBooking()" id="bookTourBtn"
+                        class="action-btn primary btn-with-spinner" style="flex: 1;">
+                        <span id="bookTourBtnText">Confirm & Book</span>
+                        <div class="btn-spinner" id="bookTourSpinner"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('profileModal')" id="closeProfileModal">&times;</button>
+            <h2 style="margin-bottom: 1.5rem; color: var(--dark); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-user-edit"></i>
+                Edit Profile
+            </h2>
+
+            <div id="profileMessage" class="form-message" style="display: none;"></div>
+
+            <form id="profileForm">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div class="profile-avatar" id="modalAvatar" style="margin: 0 auto 1rem; cursor: pointer;">
+                        <!-- Avatar will be set by JS -->
+                    </div>
+                </div>
+
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label for="firstName" class="form-label">
+                            First Name <span class="form-required">*</span>
+                        </label>
+                        <input type="text" id="firstName" class="form-control" required>
+                        <div class="form-help">Required</div>
+                    </div>
+                    <div>
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input type="text" id="lastName" class="form-control">
+                        <div class="form-help">Optional</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        Email Address <span class="form-required">*</span>
+                    </label>
+                    <input type="email" id="email" class="form-control" required>
+                    <div class="form-help">Required for account verification</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="phone" class="form-control">
+                    <div class="form-help">Optional - for important updates</div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" id="cancelProfileBtn" class="action-btn secondary" style="flex: 1;">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveProfileBtn" class="action-btn primary btn-with-spinner"
+                        style="flex: 1;">
+                        <span id="saveBtnText">Save Changes</span>
+                        <div class="btn-spinner" id="saveSpinner"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="modal" id="loadingModal">
+        <div class="modal-content"
+            style="background: transparent; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="spinner" style="width: 60px; height: 60px; border-width: 5px;"></div>
+            <p style="color: white; margin-top: 20px; font-size: 1.1rem;">Loading...</p>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = '/api';
+        const REQUEST_TIMEOUT = 10000; // 10 seconds timeout
+        let currentUser = null;
+        let isUpdatingProfile = false;
+
+        // Taxi booking variables
+        let selectedTaxiService = null;
+        let taxiServices = [];
+        let taxiBookingData = {
+            service_id: null,
+            pickup_location: '',
+            dropoff_location: '',
+            pickup_time: '',
+            passengers: 1,
+            special_instructions: ''
+        };
+
+        // Tour booking variables
+        let selectedTour = null;
+        let toursList = [];
+        let tourBookingData = {
+            tour_id: null,
+            participants: 1,
+            tour_date: '',
+            special_requests: ''
+        };
+
+        // Helper function for fetch with timeout
+        async function fetchWithTimeout(url, options = {}) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal,
+                    credentials: 'include'
+                });
+                clearTimeout(timeoutId);
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    throw new Error('Request timed out. Please try again.');
+                }
+                throw error;
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeDashboard();
+            setupEventListeners();
+        });
+
+        async function initializeDashboard() {
+            showLoading();
+
+            try {
+                // Check session with timeout
+                const sessionResponse = await fetchWithTimeout(`${API_BASE}/auth/session`);
+
+                if (!sessionResponse.ok) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Load user profile and other data in parallel
+                await Promise.allSettled([
+                    loadUserProfile(),
+                    loadUserStats(),
+                    loadRecentActivity(),
+                    loadTaxiServicesCount(),
+                    loadToursCount()
+                ]);
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showToast(error.message || 'Failed to load dashboard. Please try again.', 'error');
+
+                // Still show basic UI
+                updateProfileDisplay({ name: 'User', email: 'user@example.com' });
+                document.getElementById('welcomeMessage').textContent = 'Welcome!';
+
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Load taxi services count
+        async function loadTaxiServicesCount() {
+            try {
+                const response = await fetchWithTimeout(`${API_BASE}/services/taxis`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Taxi services response:', data);
+
+                    // Update status indicator
+                    const taxiStatus = document.getElementById('taxiServiceStatus');
+                    taxiStatus.innerHTML = `
+                        <span class="status-dot"></span>
+                        <span>${data.status === 'real' ? 'Online' : 'Simulated'}</span>
+                    `;
+                    taxiStatus.className = data.status === 'real' ? 'status-indicator status-online' : 'status-indicator status-simulated';
+
+                    // Update count
+                    const taxiData = data.data || [];
+                    const taxiCount = Array.isArray(taxiData) ? taxiData.length : 0;
+                    document.getElementById('taxiCount').textContent = `${taxiCount} Options`;
+
+                    // Also update taxi bookings count in stats
+                    document.getElementById('taxiBookings').textContent = taxiCount > 0 ? 'Available' : '0';
+                }
+            } catch (error) {
+                console.error('Error loading taxi count:', error);
+                document.getElementById('taxiCount').textContent = 'Taxi Service';
+                document.getElementById('taxiServiceStatus').innerHTML = `
+                    <span class="status-dot"></span>
+                    <span>Offline</span>
+                `;
+                document.getElementById('taxiServiceStatus').className = 'status-indicator status-offline';
+            }
+        }
+
+        // Load tours count
+        async function loadToursCount() {
+            try {
+                const response = await fetchWithTimeout(`${API_BASE}/services/tours`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Tour services response:', data);
+
+                    // Update status indicator
+                    const tourStatus = document.getElementById('tourServiceStatus');
+                    tourStatus.innerHTML = `
+                        <span class="status-dot"></span>
+                        <span>${data.status === 'real' ? 'Online' : 'Simulated'}</span>
+                    `;
+                    tourStatus.className = data.status === 'real' ? 'status-indicator status-online' : 'status-indicator status-simulated';
+
+                    // Update count
+                    const tourData = data.data || [];
+                    const tourCount = Array.isArray(tourData) ? tourData.length : 0;
+                    document.getElementById('tourCount').textContent = `${tourCount} Options`;
+
+                    // Also update tour bookings count in stats
+                    document.getElementById('tourBookings').textContent = tourCount > 0 ? 'Available' : '0';
+                }
+            } catch (error) {
+                console.error('Error loading tours count:', error);
+                document.getElementById('tourCount').textContent = 'Tour Service';
+                document.getElementById('tourServiceStatus').innerHTML = `
+                    <span class="status-dot"></span>
+                    <span>Offline</span>
+                `;
+                document.getElementById('tourServiceStatus').className = 'status-indicator status-offline';
+            }
+        }
+
+        // ==================== TAXI BOOKING FUNCTIONS ====================
+
+        // Show taxi booking modal
+        function showTaxiBookingModal() {
+            // Reset booking data
+            taxiBookingData = {
+                service_id: null,
+                pickup_location: '',
+                dropoff_location: '',
+                pickup_time: '',
+                passengers: 1,
+                special_instructions: ''
+            };
+            selectedTaxiService = null;
+
+            // Reset UI
+            resetTaxiModal();
+
+            // Show modal
+            document.getElementById('taxiModal').classList.add('active');
+
+            // Load taxi services
+            loadTaxiServices();
+        }
+
+        // Load available taxi services
+        async function loadTaxiServices() {
+            const loadingDiv = document.getElementById('taxiLoading');
+            const optionsDiv = document.getElementById('taxiOptions');
+            const noServicesDiv = document.getElementById('noTaxiServices');
+
+            loadingDiv.style.display = 'block';
+            optionsDiv.style.display = 'none';
+            noServicesDiv.style.display = 'none';
+
+            try {
+                // Fetch from our NEW REST API endpoint
+                const response = await fetchWithTimeout(`${API_BASE}/services/taxis`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    taxiServices = data.data || [];
+
+                    console.log('Loaded taxi services:', taxiServices);
+
+                    if (taxiServices.length > 0) {
+                        displayTaxiServices(taxiServices);
+                        loadingDiv.style.display = 'none';
+                        optionsDiv.style.display = 'block';
+                    } else {
+                        loadingDiv.style.display = 'none';
+                        noServicesDiv.style.display = 'block';
+                    }
+                } else {
+                    throw new Error('Failed to load taxi services');
+                }
+            } catch (error) {
+                console.error('Error loading taxi services:', error);
+                loadingDiv.style.display = 'none';
+                noServicesDiv.style.display = 'block';
+                showToast('Failed to load taxi services. Please try again.', 'error');
+            }
+        }
+
+        // Display taxi services in modal
+        function displayTaxiServices(services) {
+            const optionsDiv = document.getElementById('taxiOptions');
+            optionsDiv.innerHTML = '';
+
+            services.forEach(service => {
+                const option = document.createElement('div');
+                option.className = 'taxi-option';
+                option.id = `taxi-option-${service.id}`;
+                option.onclick = () => selectTaxiService(service);
+
+                const id = service.id || service.service_id || 'unknown';
+                const name = service.name || service.type || 'Taxi Service';
+                const basePrice = parseFloat(service.base_price || service.price || 5).toFixed(2);
+                const perKmPrice = service.price_per_km ? ` + $${parseFloat(service.price_per_km).toFixed(2)}/km` : '';
+                const description = service.description || 'Reliable transportation service';
+                const capacity = service.capacity || service.max_passengers || 4;
+                const vehicleType = service.vehicle_type || service.category || 'Sedan';
+
+                option.innerHTML = `
+                    <div class="taxi-option-header">
+                        <div class="taxi-type">${name}</div>
+                        <div class="taxi-price">$${basePrice}${perKmPrice}</div>
+                    </div>
+                    <div class="taxi-description">${description}</div>
+                    <div class="taxi-details">
+                        <span><i class="fas fa-user-friends"></i> ${capacity} passengers</span>
+                        <span><i class="fas fa-car"></i> ${vehicleType}</span>
+                    </div>
+                `;
+
+                optionsDiv.appendChild(option);
+            });
+        }
+
+        // Select a taxi service
+        function selectTaxiService(service) {
+            // Remove selected class from all options
+            document.querySelectorAll('.taxi-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Add selected class to clicked option
+            const selectedOption = document.getElementById(`taxi-option-${service.id}`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+
+            // Store selected service
+            selectedTaxiService = service;
+            taxiBookingData.service_id = service.id || service.service_id;
+
+            // Enable next button
+            document.getElementById('nextStepBtn').disabled = false;
+        }
+
+        // Taxi booking step navigation
+        function goToStep1() {
+            document.getElementById('step2Content').style.display = 'none';
+            document.getElementById('step1Content').style.display = 'block';
+
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.remove('active');
+        }
+
+        function goToStep2() {
+            if (!selectedTaxiService) {
+                showToast('Please select a taxi service', 'error');
+                return;
+            }
+
+            // Validate step 1
+            document.getElementById('step1Content').style.display = 'none';
+            document.getElementById('step2Content').style.display = 'block';
+
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+
+            // Set default pickup time to now + 1 hour
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+
+            const pickupDate = now.toISOString().split('T')[0];
+            const pickupTime = now.toTimeString().slice(0, 5);
+
+            document.getElementById('pickupDate').value = pickupDate;
+            document.getElementById('pickupTime').value = pickupTime;
+
+            // Set default pickup location
+            document.getElementById('pickupLocation').value = currentUser?.hotel_location || 'Hotel Lobby';
+        }
+
+        function goToStep3() {
+            // Validate step 2 inputs
+            const pickupLocation = document.getElementById('pickupLocation').value.trim();
+            const destination = document.getElementById('destination').value.trim();
+            const pickupDate = document.getElementById('pickupDate').value;
+            const pickupTime = document.getElementById('pickupTime').value;
+            const passengers = document.getElementById('passengers').value;
+            const instructions = document.getElementById('specialInstructions').value.trim();
+
+            if (!pickupLocation || !destination || !pickupDate || !pickupTime) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            // Store booking data
+            taxiBookingData.pickup_location = pickupLocation;
+            taxiBookingData.dropoff_location = destination;
+            taxiBookingData.pickup_time = `${pickupDate} ${pickupTime}:00`;
+            taxiBookingData.passengers = parseInt(passengers) || 1;
+            taxiBookingData.special_instructions = instructions;
+
+            // Update UI to step 3
+            document.getElementById('step2Content').style.display = 'none';
+            document.getElementById('step3Content').style.display = 'block';
+
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.add('active');
+
+            // Populate review information
+            populateReviewSection();
+        }
+
+        // Populate review section with booking details
+        function populateReviewSection() {
+            if (!selectedTaxiService) return;
+
+            // Service details
+            const serviceName = selectedTaxiService.name || selectedTaxiService.type || 'Standard Taxi';
+            const basePrice = parseFloat(selectedTaxiService.base_price || selectedTaxiService.price || 5).toFixed(2);
+
+            document.getElementById('reviewServiceType').textContent = serviceName;
+            document.getElementById('reviewServicePrice').textContent = `$${basePrice}`;
+            document.getElementById('reviewServiceDescription').textContent = selectedTaxiService.description || '';
+
+            // Pickup and destination
+            document.getElementById('reviewPickup').textContent = taxiBookingData.pickup_location;
+            document.getElementById('reviewDestination').textContent = taxiBookingData.dropoff_location;
+
+            // Date and time
+            const pickupDateTime = new Date(taxiBookingData.pickup_time);
+            const formattedDateTime = pickupDateTime.toLocaleString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('reviewDateTime').textContent = formattedDateTime;
+
+            // Passengers
+            document.getElementById('reviewPassengers').textContent =
+                `${taxiBookingData.passengers} passenger${taxiBookingData.passengers > 1 ? 's' : ''}`;
+
+            // Instructions
+            document.getElementById('reviewInstructions').textContent =
+                taxiBookingData.special_instructions || 'No special instructions';
+
+            // Final summary
+            document.getElementById('finalServiceType').textContent = serviceName;
+            document.getElementById('finalPickupTime').textContent = formattedDateTime;
+
+            // Calculate final total
+            const basePriceNum = parseFloat(selectedTaxiService.base_price || selectedTaxiService.price || 5);
+            const perKmPrice = parseFloat(selectedTaxiService.price_per_km || 2);
+            const distance = 5; // Assume 5km for demo
+            const serviceFee = 1.50;
+            const total = basePriceNum + (perKmPrice * distance) + serviceFee;
+
+            document.getElementById('finalTotal').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Confirm and book taxi
+        async function confirmTaxiBooking() {
+            const bookBtn = document.getElementById('bookTaxiBtn');
+            const bookBtnText = document.getElementById('bookBtnText');
+            const bookSpinner = document.getElementById('bookSpinner');
+            const messageDiv = document.getElementById('bookingMessage');
+
+            // Disable button and show loading
+            bookBtn.disabled = true;
+            bookBtnText.textContent = 'Booking...';
+            bookSpinner.style.display = 'inline-block';
+            messageDiv.style.display = 'none';
+
+            try {
+                // Prepare booking data for NEW taxi REST API
+                const bookingPayload = {
+                    taxi_id: taxiBookingData.service_id,
+                    user: {
+                        name: currentUser?.name || 'Guest',
+                        email: currentUser?.email || '',
+                        user_id: currentUser?.id || 'guest',
+                        notes: taxiBookingData.special_instructions
+                    }
+                };
+
+                // Call NEW REST endpoint for taxi booking
+                const response = await fetchWithTimeout(`${API_BASE}/services/taxis/book`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingPayload)
+                });
+
+                if (!response.ok) {
+                    let errorMessage = 'Failed to book taxi';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = `${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log('Taxi booking response:', result);
+
+                // Check if response has proper structure
+                let bookingId = 'N/A';
+                let bookingStatus = 'success';
+
+                if (result.booking?.booking_id) {
+                    bookingId = result.booking.booking_id;
+                } else if (result.booking_id) {
+                    bookingId = result.booking_id;
+                } else if (result.data?.booking_id) {
+                    bookingId = result.data.booking_id;
+                }
+
+                // Show success message
+                messageDiv.textContent = `Taxi booked successfully! Booking ID: ${bookingId}`;
+                messageDiv.className = 'success-message';
+                messageDiv.style.display = 'block';
+
+                // Update button to show success
+                bookBtnText.textContent = 'Booked Successfully';
+                bookBtn.style.background = 'var(--gradient-success)';
+
+                showToast('Taxi booked successfully!', 'success');
+
+                // Update taxi bookings count
+                const taxiBookingsElement = document.getElementById('taxiBookings');
+                const currentCount = parseInt(taxiBookingsElement.textContent) || 0;
+                taxiBookingsElement.textContent = currentCount + 1;
+
+                // Refresh recent activity to show new booking
+                loadRecentActivity();
+
+                // Close modal after 3 seconds
+                setTimeout(() => {
+                    closeTaxiModal();
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error booking taxi:', error);
+
+                // Show error message
+                messageDiv.textContent = error.message || 'Failed to book taxi. Please try again.';
+                messageDiv.className = 'error-message';
+                messageDiv.style.display = 'block';
+
+                // Re-enable button
+                bookBtn.disabled = false;
+                bookBtnText.textContent = 'Confirm & Book';
+                bookSpinner.style.display = 'none';
+
+                showToast(error.message || 'Failed to book taxi', 'error');
+            }
+        }
+
+        // Reset taxi modal
+        function resetTaxiModal() {
+            // Reset steps
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.remove('active');
+
+            // Reset content visibility
+            document.getElementById('step1Content').style.display = 'block';
+            document.getElementById('step2Content').style.display = 'none';
+            document.getElementById('step3Content').style.display = 'none';
+
+            // Reset button states
+            document.getElementById('nextStepBtn').disabled = true;
+
+            // Reset form fields
+            document.getElementById('pickupLocation').value = '';
+            document.getElementById('destination').value = '';
+            document.getElementById('specialInstructions').value = '';
+
+            // Reset messages
+            document.getElementById('bookingMessage').style.display = 'none';
+
+            // Reset booking button
+            const bookBtn = document.getElementById('bookTaxiBtn');
+            bookBtn.disabled = false;
+            bookBtn.style.background = '';
+            document.getElementById('bookBtnText').textContent = 'Confirm & Book';
+            document.getElementById('bookSpinner').style.display = 'none';
+        }
+
+        // Close taxi modal
+        function closeTaxiModal() {
+            document.getElementById('taxiModal').classList.remove('active');
+            resetTaxiModal();
+        }
+
+        // ==================== TOUR BOOKING FUNCTIONS ====================
+
+        // Show tour booking modal
+        function showTourBookingModal() {
+            // Reset booking data
+            tourBookingData = {
+                tour_id: null,
+                participants: 1,
+                tour_date: '',
+                special_requests: ''
+            };
+            selectedTour = null;
+
+            // Reset UI
+            resetTourModal();
+
+            // Show modal
+            document.getElementById('tourModal').classList.add('active');
+
+            // Load tours
+            loadTours();
+        }
+
+        // Load available tours
+        async function loadTours() {
+            const loadingDiv = document.getElementById('tourLoading');
+            const optionsDiv = document.getElementById('tourOptions');
+            const noToursDiv = document.getElementById('noTours');
+
+            loadingDiv.style.display = 'block';
+            optionsDiv.style.display = 'none';
+            noToursDiv.style.display = 'none';
+
+            try {
+                const response = await fetchWithTimeout(`${API_BASE}/services/tours`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    toursList = data.data || [];
+
+                    console.log('Loaded tours:', toursList);
+
+                    if (toursList.length > 0) {
+                        displayTours(toursList);
+                        loadingDiv.style.display = 'none';
+                        optionsDiv.style.display = 'block';
+                    } else {
+                        loadingDiv.style.display = 'none';
+                        noToursDiv.style.display = 'block';
+                    }
+                } else {
+                    throw new Error('Failed to load tours');
+                }
+            } catch (error) {
+                console.error('Error loading tours:', error);
+                loadingDiv.style.display = 'none';
+                noToursDiv.style.display = 'block';
+                showToast('Failed to load tours. Please try again.', 'error');
+            }
+        }
+
+        // Display tours in modal
+        function displayTours(tours) {
+            const optionsDiv = document.getElementById('tourOptions');
+            optionsDiv.innerHTML = '';
+
+            tours.forEach(tour => {
+                const option = document.createElement('div');
+                option.className = 'tour-option';
+                option.id = `tour-option-${tour.id}`;
+                option.onclick = () => selectTour(tour);
+
+                const id = tour.id || tour.tour_id || 'unknown';
+                const title = tour.title || tour.name || 'Tour Experience';
+                const price = parseFloat(tour.price || 0).toFixed(2);
+                const description = tour.description || 'Cultural experience';
+                const location = tour.location || 'Various locations';
+                const duration = tour.duration || tour.duration_hours || 4;
+
+                option.innerHTML = `
+                    <div class="tour-option-header">
+                        <div class="tour-type">${title}</div>
+                        <div class="tour-price">$${price}</div>
+                    </div>
+                    <div class="tour-description">${description}</div>
+                    <div class="tour-details">
+                        <span><i class="fas fa-map-marker-alt"></i> ${location}</span>
+                        <span><i class="fas fa-clock"></i> ${duration} hours</span>
+                    </div>
+                `;
+
+                optionsDiv.appendChild(option);
+            });
+        }
+
+        // Select a tour
+        function selectTour(tour) {
+            // Remove selected class from all options
+            document.querySelectorAll('.tour-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Add selected class to clicked option
+            const selectedOption = document.getElementById(`tour-option-${tour.id}`);
+            if (selectedOption) {
+                selectedOption.classList.add('selected');
+            }
+
+            // Store selected tour
+            selectedTour = tour;
+            tourBookingData.tour_id = tour.id || tour.tour_id;
+
+            // Enable next button
+            document.getElementById('tourNextStepBtn').disabled = false;
+
+            // Update summary
+            document.getElementById('selectedTourTitle').textContent = tour.title || tour.name;
+            document.getElementById('tourPricePerPerson').textContent = `$${parseFloat(tour.price || 0).toFixed(2)}`;
+            updateTourTotal();
+        }
+
+        // Update tour total price
+        function updateTourTotal() {
+            if (!selectedTour) return;
+
+            const participants = parseInt(document.getElementById('tourParticipants').value) || 1;
+            const total = (selectedTour.price || 0) * participants;
+
+            document.getElementById('tourTotalPrice').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Tour booking step navigation
+        function tourGoToStep1() {
+            document.getElementById('tourStep2Content').style.display = 'none';
+            document.getElementById('tourStep1Content').style.display = 'block';
+
+            document.getElementById('tourStep1').classList.add('active');
+            document.getElementById('tourStep2').classList.remove('active');
+            document.getElementById('tourStep3').classList.remove('active');
+        }
+
+        function tourGoToStep2() {
+            if (!selectedTour) {
+                showToast('Please select a tour', 'error');
+                return;
+            }
+
+            // Validate step 1
+            document.getElementById('tourStep1Content').style.display = 'none';
+            document.getElementById('tourStep2Content').style.display = 'block';
+
+            document.getElementById('tourStep1').classList.remove('active');
+            document.getElementById('tourStep2').classList.add('active');
+
+            // Set default date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('tourDate').value = tomorrow.toISOString().split('T')[0];
+
+            // Update total when participants change
+            document.getElementById('tourParticipants').addEventListener('input', updateTourTotal);
+        }
+
+        function tourGoToStep3() {
+            // Validate step 2 inputs
+            const participants = document.getElementById('tourParticipants').value;
+            const tourDate = document.getElementById('tourDate').value;
+            const specialRequests = document.getElementById('tourSpecialRequests').value.trim();
+
+            if (!participants || !tourDate) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            if (parseInt(participants) < 1 || parseInt(participants) > 20) {
+                showToast('Number of participants must be between 1 and 20', 'error');
+                return;
+            }
+
+            // Store booking data
+            tourBookingData.participants = parseInt(participants);
+            tourBookingData.tour_date = tourDate;
+            tourBookingData.special_requests = specialRequests;
+
+            // Update UI to step 3
+            document.getElementById('tourStep2Content').style.display = 'none';
+            document.getElementById('tourStep3Content').style.display = 'block';
+
+            document.getElementById('tourStep2').classList.remove('active');
+            document.getElementById('tourStep3').classList.add('active');
+
+            // Populate review information
+            populateTourReviewSection();
+        }
+
+        // Populate tour review section
+        function populateTourReviewSection() {
+            if (!selectedTour) return;
+
+            // Tour details
+            const tourTitle = selectedTour.title || selectedTour.name || 'Tour Experience';
+            const tourPrice = parseFloat(selectedTour.price || 0).toFixed(2);
+
+            document.getElementById('reviewTourTitle').textContent = tourTitle;
+            document.getElementById('reviewTourPrice').textContent = `$${tourPrice} per person`;
+            document.getElementById('reviewTourDescription').textContent = selectedTour.description || '';
+
+            // Participants and date
+            document.getElementById('reviewParticipants').textContent =
+                `${tourBookingData.participants} participant${tourBookingData.participants > 1 ? 's' : ''}`;
+
+            const formattedDate = new Date(tourBookingData.tour_date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('reviewTourDate').textContent = formattedDate;
+
+            // Special requests
+            document.getElementById('reviewTourRequests').textContent =
+                tourBookingData.special_requests || 'No special requests';
+
+            // Final summary
+            document.getElementById('finalTourTitle').textContent = tourTitle;
+            document.getElementById('finalTourDate').textContent = formattedDate;
+            document.getElementById('finalParticipants').textContent =
+                `${tourBookingData.participants} participant${tourBookingData.participants > 1 ? 's' : ''}`;
+
+            const total = (selectedTour.price || 0) * tourBookingData.participants;
+            document.getElementById('finalTourTotal').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Confirm and book tour
+        async function confirmTourBooking() {
+            const bookBtn = document.getElementById('bookTourBtn');
+            const bookBtnText = document.getElementById('bookTourBtnText');
+            const bookSpinner = document.getElementById('bookTourSpinner');
+            const messageDiv = document.getElementById('tourBookingMessage');
+
+            // Disable button and show loading
+            bookBtn.disabled = true;
+            bookBtnText.textContent = 'Booking...';
+            bookSpinner.style.display = 'inline-block';
+            messageDiv.style.display = 'none';
+
+            try {
+                // Prepare booking data for NEW tour REST API
+                const bookingPayload = {
+                    tour_id: tourBookingData.tour_id,
+                    user: {
+                        name: currentUser?.name || 'Guest',
+                        email: currentUser?.email || '',
+                        user_id: currentUser?.id || 'guest',
+                        notes: tourBookingData.special_requests,
+                        party_size: tourBookingData.participants,
+                        booking_time: tourBookingData.tour_date
+                    }
+                };
+
+                // Call NEW REST endpoint for tour booking
+                const response = await fetchWithTimeout(`${API_BASE}/services/tours/book`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingPayload)
+                });
+
+                if (!response.ok) {
+                    let errorMessage = 'Failed to book tour';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = `${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log('Tour booking response:', result);
+
+                // Show success message
+                let bookingId = 'N/A';
+                if (result.booking?.booking_id) {
+                    bookingId = result.booking.booking_id;
+                } else if (result.booking_id) {
+                    bookingId = result.booking_id;
+                } else if (result.data?.booking_id) {
+                    bookingId = result.data.booking_id;
+                }
+
+                messageDiv.textContent = `Tour booked successfully! Booking ID: ${bookingId}`;
+                messageDiv.className = 'success-message';
+                messageDiv.style.display = 'block';
+
+                // Update button to show success
+                bookBtnText.textContent = 'Booked Successfully';
+                bookBtn.style.background = 'var(--gradient-success)';
+
+                showToast('Tour booked successfully!', 'success');
+
+                // Refresh recent activity
+                loadRecentActivity();
+
+                // Update tour bookings count
+                const tourBookingsElement = document.getElementById('tourBookings');
+                const currentCount = parseInt(tourBookingsElement.textContent) || 0;
+                tourBookingsElement.textContent = currentCount + 1;
+
+                // Close modal after 3 seconds
+                setTimeout(() => {
+                    closeTourModal();
+                }, 3000);
+
+            } catch (error) {
+                console.error('Error booking tour:', error);
+
+                // Show error message
+                messageDiv.textContent = error.message || 'Failed to book tour. Please try again.';
+                messageDiv.className = 'error-message';
+                messageDiv.style.display = 'block';
+
+                // Re-enable button
+                bookBtn.disabled = false;
+                bookBtnText.textContent = 'Confirm & Book';
+                bookSpinner.style.display = 'none';
+
+                showToast(error.message || 'Failed to book tour', 'error');
+            }
+        }
+
+        // Reset tour modal
+        function resetTourModal() {
+            // Reset steps
+            document.getElementById('tourStep1').classList.add('active');
+            document.getElementById('tourStep2').classList.remove('active');
+            document.getElementById('tourStep3').classList.remove('active');
+
+            // Reset content visibility
+            document.getElementById('tourStep1Content').style.display = 'block';
+            document.getElementById('tourStep2Content').style.display = 'none';
+            document.getElementById('tourStep3Content').style.display = 'none';
+
+            // Reset button states
+            document.getElementById('tourNextStepBtn').disabled = true;
+
+            // Reset form fields
+            document.getElementById('tourParticipants').value = '1';
+            document.getElementById('tourDate').value = '';
+            document.getElementById('tourSpecialRequests').value = '';
+
+            // Reset messages
+            document.getElementById('tourBookingMessage').style.display = 'none';
+
+            // Reset booking button
+            const bookBtn = document.getElementById('bookTourBtn');
+            bookBtn.disabled = false;
+            bookBtn.style.background = '';
+            document.getElementById('bookTourBtnText').textContent = 'Confirm & Book';
+            document.getElementById('bookTourSpinner').style.display = 'none';
+        }
+
+        // Close tour modal
+        function closeTourModal() {
+            document.getElementById('tourModal').classList.remove('active');
+            resetTourModal();
+        }
+
+        // ==================== COMMON FUNCTIONS ====================
+
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const response = await fetchWithTimeout(`${API_BASE}/users/me`);
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = 'login.html';
+                        return null;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                let userData;
+                if (result.user) {
+                    userData = result.user;
+                } else if (result.id) {
+                    userData = result;
+                } else {
+                    throw new Error('Invalid user data format');
+                }
+
+                currentUser = userData;
+                updateProfileDisplay(userData);
+                populateProfileForm(userData);
+                return userData;
+
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                showToast('Failed to load profile. Please refresh.', 'error');
+                return null;
+            }
+        }
+
+        function populateProfileForm(user) {
+            if (!user) return;
+
+            const firstNameField = document.getElementById('firstName');
+            const lastNameField = document.getElementById('lastName');
+            const emailField = document.getElementById('email');
+            const phoneField = document.getElementById('phone');
+
+            if (user.name) {
+                const nameParts = user.name.split(' ');
+                if (firstNameField) firstNameField.value = nameParts[0] || '';
+                if (lastNameField) lastNameField.value = nameParts.slice(1).join(' ') || '';
+            }
+
+            if (emailField) emailField.value = user.email || '';
+            if (phoneField) phoneField.value = user.phone || '';
+        }
+
+        function updateProfileDisplay(user) {
+            if (!user) return;
+
+            try {
+                const getInitials = (name) => {
+                    if (!name) return 'U';
+                    const names = name.split(' ');
+                    let initials = names[0].charAt(0).toUpperCase();
+                    if (names.length > 1) {
+                        initials += names[names.length - 1].charAt(0).toUpperCase();
+                    }
+                    return initials;
+                };
+
+                let displayName = 'User';
+                if (user.name && user.name.trim()) {
+                    displayName = user.name;
+                } else if (user.email) {
+                    displayName = user.email.split('@')[0];
+                    displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+                }
+
+                const initials = getInitials(user.name);
+
+                // Update avatars
+                document.getElementById('userAvatar').textContent = initials;
+                document.getElementById('profileAvatar').textContent = initials;
+                document.getElementById('modalAvatar').textContent = initials;
+
+                // Update displayed names
+                document.getElementById('userName').textContent = displayName;
+                document.getElementById('profileName').textContent = displayName;
+
+                // Update other fields
+                document.getElementById('profileEmail').textContent = user.email || 'No email';
+                document.getElementById('profilePhone').textContent = user.phone || 'Not set';
+                document.getElementById('profileRole').textContent = user.role ?
+                    user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Customer';
+
+                if (user.created_at) {
+                    const memberSince = new Date(user.created_at).getFullYear();
+                    document.getElementById('memberSince').textContent = memberSince;
+                }
+
+                // Update welcome message
+                const hour = new Date().getHours();
+                let greeting = 'Welcome';
+                if (hour < 12) greeting = 'Good Morning';
+                else if (hour < 18) greeting = 'Good Afternoon';
+                else greeting = 'Good Evening';
+
+                const firstName = displayName.split(' ')[0];
+                document.getElementById('welcomeMessage').textContent = `${greeting}, ${firstName}!`;
+
+                document.getElementById('userRole').textContent = user.role ?
+                    user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Customer';
+
+            } catch (error) {
+                console.error('Error updating profile display:', error);
+            }
+        }
+
+        async function loadUserStats() {
+            try {
+                const [hotelRes, integrationRes] = await Promise.all([
+                    fetchWithTimeout(`${API_BASE}/bookings`),
+                    fetchWithTimeout(`${API_BASE}/integration-bookings`) 
+                ]);
+
+                let totalBookings = 0;
+                let activeBookings = 0;
+
+                // Process Hotel Bookings
+                if (hotelRes.ok) {
+                    const bookings = await hotelRes.json();
+                    if (Array.isArray(bookings)) {
+                        totalBookings += bookings.length;
+                        activeBookings += bookings.filter(b => b.check_out_date && new Date(b.check_out_date) >= new Date()).length;
+                    }
+                }
+
+                // Process Integration Bookings
+                if (integrationRes.ok) {
+                    const result = await integrationRes.json();
+                    const bookings = result.data || [];
+                    if (Array.isArray(bookings)) {
+                        totalBookings += bookings.length;
+                        // Count pending/confirmed as active
+                        activeBookings += bookings.filter(b => ['pending', 'confirmed'].includes(b.status)).length;
+                    }
+                }
+
+                document.getElementById('totalBookings').textContent = totalBookings;
+                document.getElementById('activeBookings').textContent = activeBookings;
+
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+
+        async function loadRecentActivity() {
+            try {
+                const [hotelRes, integrationRes] = await Promise.all([
+                    fetchWithTimeout(`${API_BASE}/bookings`),
+                    fetchWithTimeout(`${API_BASE}/integration-bookings`)
+                ]);
+
+                let allBookings = [];
+
+                // Process Hotel Bookings
+                if (hotelRes.ok) {
+                    const bookings = await hotelRes.json();
+                    if (Array.isArray(bookings)) {
+                        bookings.forEach(b => {
+                            b.type = 'hotel';
+                            b._sortDate = new Date(b.created_at || b.check_in_date);
+                        });
+                        allBookings = [...allBookings, ...bookings];
+                    }
+                }
+
+                // Process Integration Bookings
+                if (integrationRes.ok) {
+                    const result = await integrationRes.json();
+                    const bookings = result.data || [];
+                    if (Array.isArray(bookings)) {
+                        bookings.forEach(b => {
+                            b.type = b.service_type || 'service';
+                            // Map fields to match display format
+                            b.hotel_name = (b.service_type.charAt(0).toUpperCase() + b.service_type.slice(1)) + ' Service';
+                            // Parse JSON request data if needed, or use service type as title
+                            if (b.request_data && typeof b.request_data === 'string') {
+                                try {
+                                    const req = JSON.parse(b.request_data);
+                                    if(req.pickup_location) b.hotel_name += ` (${req.pickup_location})`;
+                                    else if(req.restaurant_id) b.hotel_name += ' Reservation';
+                                } catch(e){}
+                            }
+                            
+                            b._sortDate = new Date(b.booked_at);
+                            b.created_at = b.booked_at; // For display compatibility
+                        });
+                        allBookings = [...allBookings, ...bookings];
+                    }
+                }
+
+                if (allBookings.length === 0) {
+                    displayNoActivity();
+                    return;
+                }
+
+                // Sort by date desc
+                allBookings.sort((a, b) => b._sortDate - a._sortDate);
+
+                // Take top 5
+                displayRecentActivity(allBookings.slice(0, 5));
+
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+                displayNoActivity();
+            }
+        }
+
+        function displayRecentActivity(bookings) {
+            const activityList = document.getElementById('activityList');
+
+            if (!bookings || !Array.isArray(bookings) || bookings.length === 0) {
+                displayNoActivity();
+                return;
+            }
+
+            activityList.innerHTML = bookings.map((booking, index) => {
+                const isNew = index === 0;
+                const bookingDate = booking.created_at || booking.check_in_date;
+                const timeAgo = getTimeAgo(bookingDate);
+                const title = booking.hotel_name || 'Booking';
+
+                // Determine styling based on service type or status
+                let statusColor = 'var(--success)';
+                let statusIcon = 'fa-check-circle';
+                let iconBg = 'var(--success)'; // Default green
+
+                // Map service types to colors/icons
+                if (booking.type === 'taxi') {
+                    iconBg = 'var(--warning)'; // Yellow/Orange
+                    statusIcon = 'fa-taxi';
+                } else if (booking.type === 'restaurant') {
+                    iconBg = 'var(--accent)'; // Red
+                    statusIcon = 'fa-utensils';
+                } else if (booking.type === 'tour') {
+                    iconBg = 'var(--secondary)'; // Blue
+                    statusIcon = 'fa-map-marked-alt';
+                } else {
+                    // Hotel defaults
+                    statusIcon = 'fa-hotel';
+                }
+
+                // Status overrides
+                if (booking.status === 'pending') {
+                    statusColor = 'var(--warning)';
+                    if (booking.type === 'hotel') statusIcon = 'fa-clock';
+                } else if (booking.status === 'cancelled') {
+                    statusColor = 'var(--accent)';
+                    if (booking.type === 'hotel') statusIcon = 'fa-times-circle';
+                }
+
+                const displayStatus = booking.status ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) : 'Confirmed';
+
+                return `
+                    <div class="activity-item ${isNew ? 'new' : ''}">
+                        <div class="activity-icon" style="background: ${iconBg}">
+                            <i class="fas ${statusIcon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>${title}</h4>
+                            <p>${timeAgo} • <span style="color:${statusColor}">${displayStatus}</span></p>
+                            ${booking.check_in_date ?
+                        `<small style="color: var(--gray);">${booking.check_in_date} - ${booking.check_out_date || ''}</small>`
+                        : ''}
+                            ${booking.service_type === 'taxi' ? 
+                        `<small style="color: var(--gray);">TxID: ${booking.external_booking_id || 'Pending'}</small>` 
+                        : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function displayNoActivity() {
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--gray);">
+                    <i class="fas fa-calendar-plus" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p>No recent bookings</p>
+                    <button onclick="window.location.href='hotels.html'" 
+                            style="margin-top: 1rem; padding: 0.5rem 1rem; 
+                                   background: var(--primary); color: white; 
+                                   border: none; border-radius: 8px; cursor: pointer;">
+                        Book Your First Stay
+                    </button>
+                </div>
+            `;
+        }
+
+        function getTimeAgo(dateString) {
+            if (!dateString) return 'Recently';
+
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMins / 60);
+                const diffDays = Math.floor(diffHours / 24);
+
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return `${diffMins}m ago`;
+                if (diffHours < 24) return `${diffHours}h ago`;
+                if (diffDays < 7) return `${diffDays}d ago`;
+                return date.toLocaleDateString();
+            } catch (e) {
+                return 'Recently';
+            }
+        }
+
+        async function updateProfile(formData) {
+            if (isUpdatingProfile) {
+                showToast('Please wait, update in progress...', 'warning');
+                return;
+            }
+
+            isUpdatingProfile = true;
+            const saveBtn = document.getElementById('saveProfileBtn');
+            const saveBtnText = document.getElementById('saveBtnText');
+            const saveSpinner = document.getElementById('saveSpinner');
+            const messageDiv = document.getElementById('profileMessage');
+
+            // Show loading state
+            saveBtn.disabled = true;
+            saveBtnText.textContent = 'Saving...';
+            saveSpinner.style.display = 'inline-block';
+            messageDiv.style.display = 'none';
+
+            try {
+                // Build name from first and last name
+                let name = formData.firstName.trim();
+                if (formData.lastName && formData.lastName.trim()) {
+                    name += ' ' + formData.lastName.trim();
+                }
+
+                const updateData = {
+                    name: name,
+                    email: formData.email.trim(),
+                    phone: formData.phone ? formData.phone.trim() : null
+                };
+
+                const response = await fetchWithTimeout(`${API_BASE}/users/me`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (!response.ok) {
+                    let errorMessage = 'Failed to update profile';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        errorMessage = `${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+
+                // Update local user data
+                if (result.user) {
+                    currentUser = result.user;
+                    updateProfileDisplay(currentUser);
+                }
+
+                // Show success message
+                showFormMessage('Profile updated successfully!', 'success');
+                showToast('Profile updated successfully!', 'success');
+
+                // Close modal after success
+                setTimeout(() => {
+                    closeModal('profileModal');
+                }, 1500);
+
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                showFormMessage(error.message || 'Failed to update profile. Please try again.', 'error');
+                showToast(error.message || 'Failed to update profile', 'error');
+
+            } finally {
+                // Re-enable button
+                saveBtn.disabled = false;
+                saveBtnText.textContent = 'Save Changes';
+                saveSpinner.style.display = 'none';
+                isUpdatingProfile = false;
+            }
+        }
+
+        function showFormMessage(message, type) {
+            const messageDiv = document.getElementById('profileMessage');
+            messageDiv.textContent = message;
+            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+            messageDiv.style.display = 'block';
+
+            // Auto-hide success messages after 3 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        async function logout() {
+            showLoading();
+
+            try {
+                await fetchWithTimeout(`${API_BASE}/auth/logout`, {
+                    method: 'POST'
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            } finally {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // UI Helpers
+        function toggleDropdown() {
+            document.getElementById('dropdownMenu').classList.toggle('active');
+        }
+
+        function showProfileModal() {
+            document.getElementById('profileModal').classList.add('active');
+            // Reset form message
+            document.getElementById('profileMessage').style.display = 'none';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'profileModal') {
+                // Reset form state
+                const saveBtn = document.getElementById('saveProfileBtn');
+                const saveBtnText = document.getElementById('saveBtnText');
+                const saveSpinner = document.getElementById('saveSpinner');
+
+                saveBtn.disabled = false;
+                saveBtnText.textContent = 'Save Changes';
+                saveSpinner.style.display = 'none';
+
+                // Re-populate form with current user data
+                if (currentUser) {
+                    populateProfileForm(currentUser);
+                }
+            }
+        }
+
+        function showAboutModal() {
+            alert('EthioHotel - Ethiopia\'s premier hospitality management system.\n\nConnecting travelers with the best hotels, restaurants, and services across Ethiopia.');
+        }
+
+        function showContactModal() {
+            alert('Contact our support team:\n\n📞 Phone: +251 11 123 4567\n📧 Email: support@ethiohotel.com\n📍 Address: Addis Ababa, Ethiopia');
+        }
+
+        function showPrivacyModal() {
+            alert('Privacy Policy\n\nWe respect your privacy and protect your personal information in accordance with Ethiopian data protection laws.');
+        }
+
+        function showTermsModal() {
+            alert('Terms of Service\n\nBy using EthioHotel, you agree to our terms of service and booking policies.');
+        }
+
+        function showLoading() {
+            document.getElementById('loadingModal').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingModal').classList.remove('active');
+        }
+
+        function showToast(message, type = 'success') {
+            // Remove existing toasts
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' :
+                    type === 'error' ? 'fa-exclamation-triangle' :
+                        'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Form validation
+        function validateProfileForm() {
+            const firstName = document.getElementById('firstName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            let isValid = true;
+
+            // Validate first name
+            if (!firstName) {
+                showFormMessage('First name is required', 'error');
+                isValid = false;
+            }
+
+            // Validate email
+            if (!email) {
+                showFormMessage('Email address is required', 'error');
+                isValid = false;
+            } else if (!emailRegex.test(email)) {
+                showFormMessage('Please enter a valid email address', 'error');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Event Listeners setup
+        function setupEventListeners() {
+            // Profile form submission
+            const profileForm = document.getElementById('profileForm');
+            if (profileForm) {
+                profileForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+
+                    // Validate form
+                    if (!validateProfileForm()) {
+                        return;
+                    }
+
+                    const formData = {
+                        firstName: document.getElementById('firstName').value.trim(),
+                        lastName: document.getElementById('lastName').value.trim(),
+                        email: document.getElementById('email').value.trim(),
+                        phone: document.getElementById('phone').value.trim() || null
+                    };
+
+                    await updateProfile(formData);
+                });
+            }
+
+            // Cancel button
+            const cancelBtn = document.getElementById('cancelProfileBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => closeModal('profileModal'));
+            }
+
+            // Close modal button
+            const closeBtn = document.getElementById('closeProfileModal');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => closeModal('profileModal'));
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.user-profile')) {
+                    document.getElementById('dropdownMenu').classList.remove('active');
+                }
+            });
+
+            // Close modal when clicking outside
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
+
+            // Input validation styling
+            const inputs = document.querySelectorAll('#profileForm input');
+            inputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    this.classList.remove('error', 'success');
+
+                    if (this.checkValidity()) {
+                        this.classList.add('success');
+                    } else if (this.value) {
+                        this.classList.add('error');
+                    }
+                });
+
+                input.addEventListener('blur', function () {
+                    if (!this.value) {
+                        this.classList.remove('error', 'success');
+                    }
+                });
+            });
+        }
+
+        // Prevent form submission with Enter key causing multiple submissions
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                if (e.target.closest('form') && e.target.type !== 'submit') {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        // Auto-hide dropdown on window resize
+        window.addEventListener('resize', () => {
+            document.getElementById('dropdownMenu').classList.remove('active');
+        });
+    </script>
+</body>
+
+</html>

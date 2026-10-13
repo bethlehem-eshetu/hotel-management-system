@@ -1,0 +1,38 @@
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# Composer dependencies
+vendor/
+composer.lock
+
+# PHP cache & logs
+*.log
+*.cache
+/storage/logs/
+/tmp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Uploaded files (user content)
+public/uploads/
+uploads/
+
+# Compiled assets
+/node_modules/
+/public/build/
+
+# Zip / archives
+*.zip
+*.tar.gz
